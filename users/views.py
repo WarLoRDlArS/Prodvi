@@ -13,8 +13,9 @@ from django.shortcuts import redirect
 from .models import Users
 
 
-def index(request):
-    return HttpResponse("Hello To Prodvi")
+# def index(request):
+#     return HttpResponse("Hello To Prodvi")
+# above stuff is managed by home
 
 def login_page(request):
     if request.method == "POST": 
@@ -34,7 +35,7 @@ def login_page(request):
         login(request, user)
         print("Login Successful")
         #  Login is a success
-        return redirect('users:index')
+        return redirect('home:index')
 
         # Test Login
         # pid: 000000
