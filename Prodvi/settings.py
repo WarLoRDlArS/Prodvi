@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -132,3 +133,24 @@ AUTHENTICATION_BACKENDS = [
     'users.authentication.CustomBackend',
     'django.contrib.auth.backends.ModelBackend',  # Keep this if you need the default backend as well
 ]
+
+
+
+# Media 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
+# static files
+
+STATIC_ROOT = BASE_DIR / 'AllStaticFiles'
+#The STATIC_ROOT variable in settings.py defines the single folder you want to collect all your static files into.
+#  Typically, this would be a top-level folder inside your project
+STATIC_URL = 'static/'
+
+STATICFILES_DIRECTORY = [
+    BASE_DIR / "staticFiles",
+]
+# do collect static after changiny any static files
+

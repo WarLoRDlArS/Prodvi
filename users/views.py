@@ -29,8 +29,15 @@ def login_page(request):
         if user is None:
             messages.error(request, 'Invalid Credentials')
             return redirect('users:login')
+            print("User is None")
         
         login(request, user)
-        return redirect(request, 'users:index')
+        print("Login Successful")
+        #  Login is a success
+        return redirect('users:index')
+
+        # Test Login
+        # pid: 000000
+        # password: abc
 
     return render(request, 'users/login.html')
