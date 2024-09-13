@@ -27,4 +27,4 @@ to install requirements,
 pip install -r requirements.txt 
 ```
 Note : give path to the requirements file <br/>
-eg. ``` pip install Prodvi/requirements.txt ```
+eg. ``` pip install -r Prodvi/requirements.txt ```
