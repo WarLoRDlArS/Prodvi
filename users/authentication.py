@@ -17,5 +17,7 @@ class CustomBackend(BaseBackend):
     def get_user(self, user_id):
         try:
             return Users.objects.get(pk=user_id)
+            # since pid is not a primary key, get_user requires a primarykey, so i was comparing primary key with pid and so it was not authenticating.
+            # setting to 'Users.objects.get(pk=user_id)' fixed it
         except Users.DoesNotExist:
             return None
