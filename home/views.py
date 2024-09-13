@@ -7,4 +7,5 @@ from django.http import HttpResponse
 
 @login_required(login_url='users:login')
 def index(request):
-    return HttpResponse('Welcome To Prodvi')
+    print("came here")
+    return render(request, 'home/index.html')

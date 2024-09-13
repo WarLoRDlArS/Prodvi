@@ -13,8 +13,9 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, pid, password=None, **extra_fields):
-        # extra_fields.setdefault('is_staff', True) 
+    def create_superuser(self, pid, password=None, **extra_fields): 
+        if not pid:
+            raise ValueError('The PID field must be set for superuser')
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(pid, password, **extra_fields)

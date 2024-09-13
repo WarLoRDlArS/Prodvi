@@ -153,5 +153,5 @@ STATIC_URL = 'static/'
 STATICFILES_DIRECTORY = [
     BASE_DIR / "staticFiles",
 ]
-# do collect static after changiny any static files
+# do collect static after changing any static files
 
