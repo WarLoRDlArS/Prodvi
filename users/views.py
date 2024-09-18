@@ -30,10 +30,10 @@ def login_page(request):
         if user is None:
             messages.error(request, 'Invalid Credentials')
             return redirect('users:login')
-            print("User is None")
+            # print("User is None")
         
         login(request, user)
-        print("Login Successful")
+        # print("Login Successful")
         #  Login is a success
         return redirect('home:index')
 

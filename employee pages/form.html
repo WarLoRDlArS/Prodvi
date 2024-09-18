@@ -29,13 +29,13 @@
 </head>
 <body>
 
-<div class="container form-container">
+<div class="container form-container w-50">
     <h3>Appraisal Form</h3>
-    <form id="appraisalForm">
+    <form id="appraisalForm w-100">
         <!-- First Question: Sliding Numeric Value -->
-        <div class="mb-3">
+        <div class="mb-8">
             <label for="performanceRating" class="form-label">Question 1 (0-100):</label>
-            <input type="range" class="form-range" id="performanceRating" min="0" max="100" step="20" value="0" oninput="updateRangeValue(this.value)">
+            <input type="range" class="form-range" id="performanceRating" min="0" max="100" step="10" value="0" oninput="updateRangeValue(this.value)">
             <p>Selected Value: <span class="range-value" id="rangeValue">0</span></p>
         </div>
         

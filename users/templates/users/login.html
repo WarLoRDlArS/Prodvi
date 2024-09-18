@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico'%}}">
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico'%}">
 
 
     <!-- Bootstrap-->
@@ -17,9 +17,21 @@
 
 </head>
 <body>
-    <div class="container">
+    <style> 
+        .cont{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50%;
+            margin-top: 25vh;
+            border: 2px solid rgba(15, 12, 1, 0.3);
+            padding: 10px;
+            border-radius: 16px; 
+        }
+    </style>
+    <div class="container cont">
 
-        <form method="POST">
+        <form method="POST" class="col col-12">
             {% csrf_token %}
             <div class="form-group mb-3 justify-content-center align-items-center">
             <label for="pidbox">Enter PID : </label>
@@ -35,16 +47,16 @@
             <div class="">
                 {% if messages %}
                     {% for message in messages %}
-                        <div class="alert alert-light messages" role="alert" {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                        <div class="alert alert-light messages mx-1 my-2" role="alert" {% if message.tags %} class="{{ message.tags }}"{% endif %}>
                             {{ message }}
                         </div>
                     {% endfor %} 
                 {% endif %}
             </div>
 
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary mx-1 my-2">Submit</button>
         </form>
 
-    <div/>
+    </div>
 </body>
-</html>
+</html> 

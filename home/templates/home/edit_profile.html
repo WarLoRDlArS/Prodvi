@@ -17,7 +17,7 @@
 
 </head>
 <body> 
-    {% csrf_token %}
+    {% csrf_token %} 
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
@@ -25,6 +25,7 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0"> 
                     <li class="nav-item border border-secondary-subtle rounded mx-1 my-1">
@@ -60,35 +61,58 @@
                 </div>
             </div> 
         </div>
-      </nav>
+    </nav>
+    <!-- Nav Bar Ends Here -->
 
 
-    <div style="display: flex; justify-content: center; align-content: center; margin-top: 5em;">
-      <div class="container col col-12 border border-secondary-subtle mx-1 my-1">
-        <label for="notice-list-on-home-page">Pending Forms: </label>
-        <div class=" row container-fluid py-2 mx-1" id="notice-list-on-home-page">
-            <div class="border border-secondary-subtle">
-                {% if notices %}
-                    Top 5 Pending Forms
-                {% else %}
-                    No Pending Forms
-                {% endif %}
+
+    <!-- Profile Starts Here -->
+    <div class="container mb-2">
+        <h3 class="text-center">Personal Details</h3>
+    
+        {% if request.user.is_authenticated %}
+        <div class="card personal-details-card">
+            <div class="card-body">
+                <h5 class="card-title">Larson Sequeira</h5>
+                <p class="card-text">Here are your personal details. If any information is incorrect, Sorry!! Cant do Anything.</p>
+    
+                <table class="table table-bordered mt-3">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Employee ID</th>
+                            <td>{{ employee.pid }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Department</th>
+                            <td>{{ employee.department }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Role</th>
+                            <td>{{ employee.role }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Email</th>
+                            <td>larson@gmail.com</td>
+                        </tr> 
+                        <tr>
+                            <th scope="row">Date of Joining</th>
+                            <td>{{ employee.doj }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="ms-auto" >
+                <a href="">
+                    <button class="btn btn-outline-danger my-3 mx-2">Edit Profile Details</button>
+                </a>
             </div>
         </div>
-
-
-
-        <label for="notice-list-on-home-page">Notices For You:</label>
-        <div class="row container-fluid py-2 mx-1" id="notice-list-on-home-page">
-            <div class="border border-secondary-subtle">
-                {% if notices %}
-                    Top 5 Notices List
-                {% else %}
-                    No Notices for Now
-                {% endif %}
-            </div>
-        </div>
-      </div>
+        {% endif %}
     </div>
+
+    <div>
+        My Appraisals:
+    </div>
+    
 </body>
 </html>
