@@ -9,4 +9,5 @@ urlpatterns = [
     # stuff got removed from here to home
 
     path('login/', views.login_page, name='login'),
+    path('',views.landing_page,name='landing'),
 ]
