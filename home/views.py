@@ -6,8 +6,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.contrib.auth import logout
 from django.shortcuts import redirect 
-from .models import Employee, Manager
+
+from .models import Employee, Manager, Notice
 from users.models import Users
+
+from .forms import NoticeForm
+
 
 @login_required(login_url='users:login')
 def index(request):
@@ -39,6 +43,7 @@ from .models import Forms, Questions
 @login_required(login_url='users:login')
 def createfeedbackform(request):
     if request.method == 'POST':
+        print(request.POST)
         # Get the form title from the POST data
         form_title = request.POST.get('title')
         
@@ -67,3 +72,33 @@ def createfeedbackform(request):
         return redirect('home:index')  # Redirect to a success page or form list
 
     return render(request, 'home/createFormTemplate.html')
+
+
+@login_required
+def NoticeView(request):
+    notices = Notice.objects.all()
+    emp = Employee.objects.get(user=request.user)
+    is_manager = emp.is_manager
+
+    print(f"User: {request.user.username}, is_manager: {is_manager}")
+    return render(request, 'home/notice.html', {
+        'notices': notices,
+        'is_manager': is_manager,
+    })
+
+@login_required(login_url='users:login')
+def add_notice(request):
+    currentuseremp = Employee.objects.get(user=request.user)
+    if not currentuseremp.is_manager:
+        return redirect('home:notice')  # Redirect if not a manager
+
+    if request.method == 'POST':
+        form = NoticeForm(request.POST)
+        if form.is_valid():
+            notice = form.save(commit=False)
+            notice.posted_by = request.user  # Set the user who posted the notice
+            notice.save()
+            return redirect('home:notice')  # Redirect to the notices page
+    else:
+        form = NoticeForm()
+    return render(request, 'home/add_notice.html', {'form': form})

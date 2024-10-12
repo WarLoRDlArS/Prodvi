@@ -8,10 +8,8 @@ class CustomBackend(BaseBackend):
         try:
             user = Users.objects.get(pid=pid)
             if user.check_password(password):
-                print("AUthenticate all fine")
                 return user
-        except Users.DoesNotExist:
-            print("Authenticate IN exception")
+        except Users.DoesNotExist: 
             return None
             
     def get_user(self, user_id):

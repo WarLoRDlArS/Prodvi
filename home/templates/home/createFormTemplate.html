@@ -25,11 +25,21 @@
                 <input type="text" class="form-control" id="form-title" name="title" required>
             </div>
 
+            <div class="mb-3">
+                <label for="review-date" class="form-label">Review Date</label>
+                <input type="date" class="form-control" id="review-date" name="review_date" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="submission-date" class="form-label">Final Submission Date</label>
+                <input type="date" class="form-control" id="submission-date" name="submission_date">
+            </div>
+
             <div id="questions">
                 <h4>Questions</h4>
-                <div class="question mb-3" id="question-template" style="display: none;">
-                    <input type="text" class="form-control" name="question_text" placeholder="Enter your question">
-                    <select class="form-select my-2" name="question_type">
+                <div class="question mb-3">
+                    <input type="text" class="form-control" name="question_text_0" placeholder="Enter your question" required>
+                    <select class="form-select my-2" name="question_type_0">
                         <option value="text">Text</option>
                         <option value="numeric">Numeric</option>
                     </select>
@@ -38,31 +48,26 @@
             </div>
 
             <button type="button" id="add-question" class="btn btn-primary">Add Question</button>
-            <button type="submit" class="btn btn-success mt-3">Submit Form</button>
+            <button type="submit" class="btn btn-success">Submit Form</button>
         </form>
     </div>
 
     <script>
-        let questionCount = 0;  // Counter to keep track of questions
+        let questionCount = 1;  // Start from 1 since we already have one question
 
         document.getElementById('add-question').addEventListener('click', function () {
-            questionCount++;
-            const questionTemplate = document.getElementById('question-template').cloneNode(true);
-            questionTemplate.style.display = 'block';
-            questionTemplate.removeAttribute('id'); // Remove id to avoid duplicates
-            
-            // Update name attributes to make them unique
-            const inputs = questionTemplate.querySelectorAll('input, select');
-            inputs.forEach((input) => {
-                if (input.type === "text") {
-                    input.name = `question_text_${questionCount}`; // Unique name for question text
-                    input.required = true; // Make the cloned input required
-                } else if (input.tagName === "SELECT") {
-                    input.name = `question_type_${questionCount}`; // Unique name for question type
-                }
-            });
-
+            const questionTemplate = document.createElement('div');
+            questionTemplate.className = 'question mb-3';
+            questionTemplate.innerHTML = `
+                <input type="text" class="form-control" name="question_text_${questionCount}" placeholder="Enter your question" required>
+                <select class="form-select my-2" name="question_type_${questionCount}">
+                    <option value="text">Text</option>
+                    <option value="numeric">Numeric</option>
+                </select>
+                <button type="button" class="btn btn-danger remove-question">Remove Question</button>
+            `;
             document.getElementById('questions').appendChild(questionTemplate);
+            questionCount++;  // Increment for the next question
         });
 
         document.getElementById('questions').addEventListener('click', function (e) {

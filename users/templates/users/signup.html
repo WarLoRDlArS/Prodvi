@@ -24,13 +24,18 @@
 <body>
   <div class="container bg-white">
     <h1 class="text-center text-dark mb-4">Signup</h1>
-    <form action="#" method="POST">
+    <form method="POST">
 
       {% csrf_token %}
 
 
       <div class="mb-3">
         <label for="name" class="form-label">Name :</label>
+        <span>
+          {% if messages and 'signup_diff_passwd' in message.tags %} 
+            <div>{{ message }}</div>
+          {% endif %}
+        </span>
         <input type="text" id="name" name="name" class="form-control" required />
       </div>
 

@@ -95,3 +95,12 @@ class NumericResponse(models.Model):
 
     def __str__(self):
         return f"Response by {self.user.username} with value {self.answer_value}"
+
+class Notice(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    posted_on = models.DateTimeField(auto_now_add=True)
+    posted_by = models.ForeignKey(Users, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title

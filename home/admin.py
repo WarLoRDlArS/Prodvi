@@ -13,6 +13,12 @@ class ManagerAdmin(admin.ModelAdmin):
     list_display = ('user', 'managerid')
     search_fields = ('user', 'managerid')
     ordering = ('managerid', )
+    fieldsets = (
+        (None, {
+            'fields': ('user', 'managerid'),
+        }),
+    )
+
 
 # Register the above Models
 admin.site.register(Employee, EmployeeAdmin)
