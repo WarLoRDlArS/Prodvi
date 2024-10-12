@@ -2,85 +2,75 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Create Feedback Form</title>
 
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico'%}">
-
-
-    <!-- Bootstrap-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <!-- -->
-
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-<body> 
-    {% csrf_token %} 
 
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Prodvi</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-            </button>
+<body>
+    {% include 'home/navbar.html' %}
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0"> 
-                    <li class="nav-item border border-secondary-subtle rounded mx-1 my-1">
-                    <a class="nav-link active" href="#">Notices</a>
-                    </li>
-                    <li class="nav-item  border border-danger-subtle rounded mx-1 my-1">
-                    <a class="nav-link active text-danger" href="#">Memo</a>
-                    </li>
-                    <li class="nav-item dropdown border border-secondary-subtle rounded mx-1 my-1">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Forms
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Forms For Me</a></li>
-                            <li><a class="dropdown-item" href="#">Filled Forms</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                        </ul>
-                    </li> 
-                </ul> 
+    <div class="container my-5">
+        <h2>Create Feedback Form</h2>
+        <form id="feedback-form" method="POST" action="{% url 'home:createfeedbackform' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="form-title" class="form-label">Form Title</label>
+                <input type="text" class="form-control" id="form-title" name="title" required>
+            </div>
 
-                {% if request.user.is_authenticated %}
-                <div class="ms-auto">
-                    <a href="/profile/">
-                        <button class="nav-iten btn btn-success mx-1 my-1">
-                            My Profile
-                        </button>
-                    </a>
-                    <a href="/logout/">
-                        <button class="nav-item btn btn-danger mx-1 my-1"> Logout </button>
-                    </a>
-                {% endif %}
+            <div id="questions">
+                <h4>Questions</h4>
+                <div class="question mb-3" id="question-template" style="display: none;">
+                    <input type="text" class="form-control" name="question_text" placeholder="Enter your question">
+                    <select class="form-select my-2" name="question_type">
+                        <option value="text">Text</option>
+                        <option value="numeric">Numeric</option>
+                    </select>
+                    <button type="button" class="btn btn-danger remove-question">Remove Question</button>
                 </div>
-            </div> 
-        </div>
-    </nav>
-    <!-- Nav Bar Ends Here -->
+            </div>
 
-
-    <div>
-        <form>
-            <!-- Form will come here -->
-             <div id="questions">
-                <!-- this section will contain all questions stuff  -->
-             </div>
-             <button>
-                <!-- button for addin more questions -->
-             </button>
+            <button type="button" id="add-question" class="btn btn-primary">Add Question</button>
+            <button type="submit" class="btn btn-success mt-3">Submit Form</button>
         </form>
     </div>
+
     <script>
-        // script for controlling the form tab
-        let question_count = 0;
-        let addTextQuestion = function() {}
-        let addNumericQuestion = function() {}
+        let questionCount = 0;  // Counter to keep track of questions
+
+        document.getElementById('add-question').addEventListener('click', function () {
+            questionCount++;
+            const questionTemplate = document.getElementById('question-template').cloneNode(true);
+            questionTemplate.style.display = 'block';
+            questionTemplate.removeAttribute('id'); // Remove id to avoid duplicates
+            
+            // Update name attributes to make them unique
+            const inputs = questionTemplate.querySelectorAll('input, select');
+            inputs.forEach((input) => {
+                if (input.type === "text") {
+                    input.name = `question_text_${questionCount}`; // Unique name for question text
+                    input.required = true; // Make the cloned input required
+                } else if (input.tagName === "SELECT") {
+                    input.name = `question_type_${questionCount}`; // Unique name for question type
+                }
+            });
+
+            document.getElementById('questions').appendChild(questionTemplate);
+        });
+
+        document.getElementById('questions').addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-question')) {
+                e.target.closest('.question').remove();
+            }
+        });
     </script>
 </body>
+
 </html>
