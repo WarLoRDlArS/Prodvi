@@ -65,54 +65,22 @@
     <!-- Nav Bar Ends Here -->
 
 
-
-    <!-- Profile Starts Here -->
-    <div class="container mb-2">
-        <h3 class="text-center">Personal Details</h3>
-    
-        {% if request.user.is_authenticated %}
-        <div class="card personal-details-card">
-            <div class="card-body">
-                <h5 class="card-title">Larson Sequeira</h5>
-                <p class="card-text">Here are your personal details. If any information is incorrect, Sorry!! Cant do Anything.</p>
-    
-                <table class="table table-bordered mt-3">
-                    <tbody>
-                        <tr>
-                            <th scope="row">Employee ID</th>
-                            <td>{{ employee.empid }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Department</th>
-                            <td>{{ employee.empdept }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Role</th>
-                            <td>{{ employee.role }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Email</th>
-                            <td>{{ employee.user.email }}</td>
-                        </tr> 
-                        <tr>
-                            <th scope="row">Date of Joining</th>
-                            <td>{{ employee.doj }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="ms-auto" >
-                <a href="">
-                    <button class="btn btn-outline-danger my-3 mx-2">Edit Profile Details</button>
-                </a>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-
     <div>
-        My Appraisals:
+        <form>
+            <!-- Form will come here -->
+             <div id="questions">
+                <!-- this section will contain all questions stuff  -->
+             </div>
+             <button>
+                <!-- button for addin more questions -->
+             </button>
+        </form>
     </div>
-    
+    <script>
+        // script for controlling the form tab
+        let question_count = 0;
+        let addTextQuestion = function() {}
+        let addNumericQuestion = function() {}
+    </script>
 </body>
 </html>

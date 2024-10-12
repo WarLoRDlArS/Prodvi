@@ -5,20 +5,32 @@ from users.models import Users
 
 class Employee(models.Model):
     user = models.OneToOneField(Users, on_delete=models.CASCADE)
-    empid = models.PositiveIntegerField(primary_key=True)
-    empname = models.CharField(max_length=255)  # Assuming employee name is a string
+    empid = models.CharField(primary_key=True, max_length=6)  # You might want to set a max length
+    empname = models.CharField(max_length=255)
     empdept = models.ForeignKey('Department', on_delete=models.SET_NULL, null=True)
-    managerid = models.ForeignKey('Manager', on_delete=models.SET_NULL, null=True, blank=True)
+    managerid = models.ForeignKey('Manager', on_delete=models.SET_NULL, null=True, blank=True, related_name='employees')
     is_manager = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+        if not self.empid:  # Only set empid if it's not already set
+            self.empid = self.user.pid  # Set empid from user's pid
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return self.empname
+        return f"Name: {self.empname} PID: {self.user.pid}"  # Use self.user.pid
+
 
 class Manager(models.Model):
     user = models.OneToOneField(Users, on_delete=models.CASCADE)
-    managerid = models.PositiveIntegerField(primary_key=True)
+    # employee = models.OneToOneField(Employee, on_delete=models.CASCADE) 
+    managerid = models.CharField(primary_key=True, max_length=6)  # You might want to set a max length
     is_manager = models.BooleanField(default=True)
-    user_pid = models.CharField(max_length=6)
+    # user_pid = models.CharField(max_length=6)
+
+    def save(self, *args, **kwargs):
+        if not self.managerid:  # Only set empid if it's not already set
+            self.managerid = self.user.pid  # Set empid from user's pid
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Manager {self.user.username} ({self.managerid})"
