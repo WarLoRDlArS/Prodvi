@@ -42,3 +42,10 @@ def login_page(request):
         # password: abc
 
     return render(request, 'users/login.html')
+def landing_page(request):
+    
+    return render(request, 'users/landing_page.html')
+
+def signup_page(request):
+    
+    return render(request, 'users/signup.html')
