@@ -45,3 +45,7 @@ def login_page(request):
 def landing_page(request):
     
     return render(request, 'users/landing_page.html')
+
+def signup_page(request):
+    
+    return render(request, 'users/signup.html')
