@@ -24,7 +24,7 @@ def login_page(request):
         password = request.POST.get("password")
 
         if not Users.objects.filter(pid=pid).exists():
-            messages.error(request, 'Invalid Username')
+            messages.error(request, 'Invalid PID')
             return redirect('users:login')
         
         user = authenticate(request, pid=pid, password=password)

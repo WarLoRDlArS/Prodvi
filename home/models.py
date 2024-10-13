@@ -59,14 +59,7 @@ class Forms(models.Model):
 
     def __str__(self):
         return self.title
-
-class FormAssignedByTo(models.Model):
-    manager = models.ForeignKey(Manager, on_delete=models.CASCADE)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    assign_date = models.DateField()
-    has_filled = models.BooleanField(default=False)
-    has_viewed = models.BooleanField(default=False)
-    form = models.ForeignKey(Forms, on_delete=models.CASCADE)
+ 
 
 class Questions(models.Model):
     QUESTION_TYPE_CHOICES = [
@@ -104,3 +97,20 @@ class Notice(models.Model):
 
     def __str__(self):
         return self.title
+
+class Group(models.Model):
+    name = models.CharField(max_length=255)
+    managers = models.ManyToManyField(Manager, related_name='managed_groups')
+    employees = models.ManyToManyField(Employee, related_name='groups')
+
+    def __str__(self):
+        return self.name
+
+class FormAssignedByTo(models.Model):
+    manager = models.ForeignKey(Manager, on_delete=models.CASCADE)
+    form = models.ForeignKey(Forms, on_delete=models.CASCADE)
+    assign_date = models.DateField()
+    has_filled = models.BooleanField(default=False)
+    has_viewed = models.BooleanField(default=False)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)  # Link to group
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True)  # Optional for direct assignments

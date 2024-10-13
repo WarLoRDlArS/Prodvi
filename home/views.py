@@ -100,3 +100,36 @@ def add_notice(request):
     else:
         form = NoticeForm()
     return render(request, 'home/add_notice.html', {'form': form})
+
+
+def create_group(request):
+    if request.method == 'POST':
+        group_name = request.POST.get('group_name')
+        new_group = Group(name=group_name)
+        new_group.save()
+        # Add manager to the group
+        new_group.managers.add(request.user.employee.manager)  # Assuming the manager is logged in
+        return redirect('group_list')
+
+    return render(request, 'create_group.html')
+
+def group_list(request):
+    groups = Group.objects.filter(managers=request.user.employee.manager)
+    return render(request, 'group_list.html', {'groups': groups})
+
+def assign_form_to_group(request, form_id):
+    form = Forms.objects.get(id=form_id)
+    group = request.POST.get('group_id')
+
+    if request.method == 'POST':
+        form_assignment = FormAssignedByTo.objects.create(
+            manager=request.user.employee.manager,
+            form=form,
+            group=Group.objects.get(id=group),
+            assign_date=date.today()
+        )
+        # Optionally notify users in the group (e.g., send emails, create notifications)
+        return redirect('form_list')
+
+    groups = Group.objects.filter(managers=request.user.employee.manager)
+    return render(request, 'assign_form.html', {'form': form, 'groups': groups})

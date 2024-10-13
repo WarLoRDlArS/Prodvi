@@ -117,9 +117,9 @@
       <div class="">
         {% if messages %}
         {% for message in messages %}
-        <div class="alert alert-light messages mx-1 my-2" role="alert" {% if message.tags %} class="{{ message.tags }}"
+        <div class="alert alert-light messages mx-1 my-2" role="alert" {% if message.tags %} class="{{ message.tags }}" style="color: red;"
           {% endif %}>
-          {{ message }}
+          **{{ message }}**
         </div>
         {% endfor %}
         {% endif %}
