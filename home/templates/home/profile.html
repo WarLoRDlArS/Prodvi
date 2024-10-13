@@ -24,57 +24,8 @@
 <body>
     {% csrf_token %}
 
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Prodvi</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item border border-secondary-subtle rounded mx-1 my-1">
-                        <a class="nav-link active" href="#">Notices</a>
-                    </li>
-                    <li class="nav-item  border border-danger-subtle rounded mx-1 my-1">
-                        <a class="nav-link active text-danger" href="#">Memo</a>
-                    </li>
-                    <li class="nav-item dropdown border border-secondary-subtle rounded mx-1 my-1">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            Forms
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Forms For Me</a></li>
-                            <li><a class="dropdown-item" href="#">Filled Forms</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                        </ul>
-                    </li>
-                </ul>
-
-                {% if request.user.is_authenticated %}
-                <div class="ms-auto">
-                    <a href="/profile/">
-                        <button class="nav-iten btn btn-success mx-1 my-1">
-                            My Profile
-                        </button>
-                    </a>
-                    <a href="/logout/">
-                        <button class="nav-item btn btn-danger mx-1 my-1"> Logout </button>
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </nav>
-    <!-- Nav Bar Ends Here -->
-
-
+    <!-- Navbar is Below -->
+    {% include 'home/navbar.html' %}
 
     <!-- Profile Starts Here -->
     <div class="container mb-2">

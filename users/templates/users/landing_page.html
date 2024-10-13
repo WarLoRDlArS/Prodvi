@@ -196,7 +196,7 @@
 </head>
 
 <body>
-  
+
   {% csrf_token %}
 
   <div class="video-container">
@@ -231,6 +231,9 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'users:login' %}">Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'users:signup' %}">Sign Up</a>
               </li>
             </ul>
           </div>

@@ -7,10 +7,10 @@ from django.http import HttpResponse
 from django.contrib.auth import logout
 from django.shortcuts import redirect 
 
-from .models import Employee, Manager, Notice
+from .models import *
 from users.models import Users
 
-from .forms import NoticeForm
+from .forms import NoticeForm, FeedbackForm
 
 
 @login_required(login_url='users:login')
@@ -36,42 +36,40 @@ def user_profile(request):
     return render(request, 'home/profile.html',context=context)
 
  
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Forms, Questions
-
 @login_required(login_url='users:login')
 def createfeedbackform(request):
     if request.method == 'POST':
         print(request.POST)
-        # Get the form title from the POST data
-        form_title = request.POST.get('title')
+        form = FeedbackForm(request.POST)
         
-        # Create and save the Forms instance
-        form_instance = Forms(title=form_title, status='fresh')
-        form_instance.save()
+        if form.is_valid():
+            form_instance = form.save(commit=False)
+            form_instance.status = 'fresh'
+            form_instance.save()
 
-        # Initialize lists for question texts and types
-        questions = []
-        for key in request.POST:
-            if key.startswith('question_text_'):
-                index = key.split('_')[-1]  # Get the question number
-                question_text = request.POST.get(key)
-                question_type = request.POST.get(f'question_type_{index}')
-                questions.append((question_text, question_type))
-        
-        # Loop through the questions and save them
-        for question_text, question_type in questions:
-            if question_text:  # Ensure that the question text is not empty
-                Questions.objects.create(
-                    form=form_instance,
-                    question_text=question_text,
-                    question_type=question_type
-                )
+            # Initialize lists for question texts and types
+            questions = []
+            for key in request.POST:
+                if key.startswith('question_text_'):
+                    index = key.split('_')[-1]  # Get the question number
+                    question_text = request.POST.get(key)
+                    question_type = request.POST.get(f'question_type_{index}')
+                    questions.append((question_text, question_type))
+            
+            # Loop through the questions and save them
+            for question_text, question_type in questions:
+                if question_text:  # Ensure that the question text is not empty
+                    Questions.objects.create(
+                        form=form_instance,
+                        question_text=question_text,
+                        question_type=question_type
+                    )
 
-        return redirect('home:index')  # Redirect to a success page or form list
+            return redirect('home:index')  # Redirect to a success page or form list
+    else:
+        form = FeedbackForm()
 
-    return render(request, 'home/createFormTemplate.html')
+    return render(request, 'home/createFormTemplate.html', {'form': form})
 
 
 @login_required
