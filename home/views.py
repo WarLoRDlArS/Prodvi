@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from datetime import date
-
+from django.contrib import messages
 # Create your views here.
 
 from django.contrib.auth.decorators import login_required
@@ -167,3 +167,29 @@ def assign_form_to_group(request, form_id):
     # Fetch available groups
     groups = Group.objects.filter(managers=request.user.employee.managerid)
     return render(request, 'home/assign_form.html', {'form': form, 'groups': groups, 'assigned_users': assigned_users})
+@login_required(login_url='users:login')
+def edit_profile(request):
+    current_user = request.user
+    employee = Employee.objects.get(user=current_user)
+    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        
+        # Update user details
+        current_user.username = username
+        current_user.email = email
+        current_user.save()
+
+        # Update employee name
+        employee.empname = username
+        employee.save()
+
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('home:userProfile')  # Redirect to profile page after saving
+    
+    context = {
+        'employee': employee,
+         'current_user': current_user,
+    }
+    return render(request, 'home/edit_profile.html', context)
