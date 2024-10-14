@@ -35,6 +35,10 @@ class Users(AbstractUser):
     pid = models.CharField(max_length=6, blank=False, null=False, default="000000", unique=True)
     username = models.CharField(max_length=150, blank=True, null=True, unique=True)
     email = models.EmailField(blank=True, default="abc@abc.com")
+    role = models.CharField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.username} - {self.role}"
 
     USERNAME_FIELD = 'username'  # Use 'username' for authentication
     REQUIRED_FIELDS = ['pid']  # Include 'pid' in required fields for createsuperuser

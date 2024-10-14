@@ -9,6 +9,7 @@ class Employee(models.Model):
     empname = models.CharField(max_length=255)
     empdept = models.ForeignKey('Department', on_delete=models.SET_NULL, null=True)
     managerid = models.ForeignKey('Manager', on_delete=models.SET_NULL, null=True, blank=True, related_name='employees')
+    doj = models.DateField(null=True, blank=True)
     is_manager = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):

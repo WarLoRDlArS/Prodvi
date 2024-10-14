@@ -46,11 +46,15 @@
                         </tr>
                         <tr>
                             <th scope="row">Department</th>
-                            <td>{{ employee.empdept }}</td>
+                            <td>{{ employee.empdept.dept_name }}</td>
                         </tr>
                         <tr>
                             <th scope="row">Role</th>
-                            <td>{{ employee.role }}</td>
+                            <td>{{ user_role }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Username</th>
+                            <td>{{ employee.empname }}</td>
                         </tr>
                         <tr>
                             <th scope="row">Email</th>
@@ -58,7 +62,7 @@
                         </tr>
                         <tr>
                             <th scope="row">Date of Joining</th>
-                            <td>{{ employee.doj }}</td>
+                            <td>{{ doj }}</td>
                         </tr>
                     </tbody>
                 </table>

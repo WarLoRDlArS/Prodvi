@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from datetime import date
 
 # Create your views here.
 
@@ -29,10 +30,17 @@ def logout_link(request):
 def user_profile(request):
     # do all query stuff and all over here
     if request.user.is_authenticated: 
-        current_user = Users.objects.filter(pid=request.user.pid)  
-        employee = Employee.objects.filter(user = current_user[0])[0] 
+        current_user = Users.objects.get(pid=request.user.pid)  
+        employee = Employee.objects.filter(user = current_user).first()
+        role = 'Manager' if employee and employee.is_manager else 'Employee'
+        doj = employee.doj if employee and employee.doj else 'Not available'
 
-    context = {'employee': employee, }
+    context = {
+            'user_role': role,  # Check if role exists
+            'employee': employee,
+            'doj':'doj',
+        }
+
     return render(request, 'home/profile.html',context=context)
 
 
