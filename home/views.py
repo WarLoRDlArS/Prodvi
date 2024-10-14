@@ -35,13 +35,12 @@ def user_profile(request):
     context = {'employee': employee, }
     return render(request, 'home/profile.html',context=context)
 
- 
+
 @login_required(login_url='users:login')
 def createfeedbackform(request):
     if request.method == 'POST':
-        print(request.POST)
         form = FeedbackForm(request.POST)
-        
+
         if form.is_valid():
             form_instance = form.save(commit=False)
             form_instance.status = 'fresh'
@@ -55,7 +54,7 @@ def createfeedbackform(request):
                     question_text = request.POST.get(key)
                     question_type = request.POST.get(f'question_type_{index}')
                     questions.append((question_text, question_type))
-            
+
             # Loop through the questions and save them
             for question_text, question_type in questions:
                 if question_text:  # Ensure that the question text is not empty
@@ -65,7 +64,8 @@ def createfeedbackform(request):
                         question_type=question_type
                     )
 
-            return redirect('home:index')  # Redirect to a success page or form list
+            # Redirect to assign form template after creation
+            return redirect('home:assign_form_to_group', form_id=form_instance.form_id)  # Update the URL name as needed
     else:
         form = FeedbackForm()
 
@@ -102,34 +102,60 @@ def add_notice(request):
     return render(request, 'home/add_notice.html', {'form': form})
 
 
+@login_required(login_url='users:login')
 def create_group(request):
     if request.method == 'POST':
         group_name = request.POST.get('group_name')
         new_group = Group(name=group_name)
         new_group.save()
         # Add manager to the group
-        new_group.managers.add(request.user.employee.manager)  # Assuming the manager is logged in
-        return redirect('group_list')
+        new_group.managers.add(request.user.employee.managerid)  # Assuming the manager is logged in
+        return redirect('home:group_list')
 
     return render(request, 'create_group.html')
 
+@login_required(login_url='users:login')
 def group_list(request):
-    groups = Group.objects.filter(managers=request.user.employee.manager)
-    return render(request, 'group_list.html', {'groups': groups})
+    groups = Group.objects.filter(managers=request.user.employee.managerid)
+    return render(request, 'home/group_list.html', {'groups': groups})
 
+
+@login_required(login_url='users:login')
 def assign_form_to_group(request, form_id):
-    form = Forms.objects.get(id=form_id)
-    group = request.POST.get('group_id')
-
+    form = Forms.objects.get(form_id=form_id)
+    assigned_users = []
+    
     if request.method == 'POST':
-        form_assignment = FormAssignedByTo.objects.create(
-            manager=request.user.employee.manager,
-            form=form,
-            group=Group.objects.get(id=group),
-            assign_date=date.today()
-        )
-        # Optionally notify users in the group (e.g., send emails, create notifications)
-        return redirect('form_list')
+        group_id = request.POST.get('group_id')
+        pid_list = request.POST.get('pids', '').split(',')
 
-    groups = Group.objects.filter(managers=request.user.employee.manager)
-    return render(request, 'assign_form.html', {'form': form, 'groups': groups})
+        # Assign form to group if selected
+        if group_id:
+            group = Group.objects.get(id=group_id)
+            FormAssignedByTo.objects.create(
+                manager=request.user.employee.managerid,
+                form=form,
+                group=group,
+                assign_date=date.today()
+            )
+
+        # Assign form to users based on PIDs
+        for pid in pid_list:
+            pid = pid.strip()
+            try:
+                user = Users.objects.get(pid=pid)
+                FormAssignedByTo.objects.create(
+                    manager=request.user.employee.managerid,  # Ensure this is correct
+                    form=form,
+                    employee=user.employee,
+                    assign_date=date.today()
+                )
+                assigned_users.append(user)
+            except Users.DoesNotExist:
+                continue
+
+        return redirect('home:index')
+
+    # Fetch available groups
+    groups = Group.objects.filter(managers=request.user.employee.managerid)
+    return render(request, 'home/assign_form.html', {'form': form, 'groups': groups, 'assigned_users': assigned_users})

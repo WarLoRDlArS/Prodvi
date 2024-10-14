@@ -11,4 +11,7 @@ urlpatterns = [
     path("createfeedbackform/", views.createfeedbackform, name='createfeedbackform'),
     path('notice/', views.NoticeView, name='notice'),
     path('add_notice/', views.add_notice, name='add_notice'), 
+    path('create-group/', views.create_group, name='create_group'),
+    path('groups/', views.group_list, name='group_list'),
+    path('assign-form/<int:form_id>/', views.assign_form_to_group, name='assign_form_to_group'),
 ]
