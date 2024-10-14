@@ -61,7 +61,7 @@ def signup_page(request):
 
         if password1 != password2:
             print("Re-Enter password")
-            messages.add_message(request, message.error, 'Password Should be Same',extra_tags='signup_diff_passwd')
+            messages.add_message(request, messages.error, 'Password Should be Same',extra_tags='signup_diff_passwd')
             return redirect('users:signup')
 
         if len(pid) != 6:
@@ -90,7 +90,7 @@ def signup_page(request):
             return redirect('users:login')
         except:
             print('some error occured')
-            messages.add_message(request, message.error, 'Sorry! User could not be Created', extra_tags='signup_user_not_created')
+            messages.add_message(request, messages.error, 'Sorry! User could not be Created', extra_tags='signup_user_not_created')
             return redirect('users:signup')
 
     return render(request, 'users/signup.html')
