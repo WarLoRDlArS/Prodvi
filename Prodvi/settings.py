@@ -150,7 +150,7 @@ STATIC_ROOT = BASE_DIR / 'AllStaticFiles'
 #  Typically, this would be a top-level folder inside your project
 STATIC_URL = 'static/'
 
-STATICFILES_DIRECTORY = [
+STATICFILES_DIRS = [
     BASE_DIR / "staticFiles",
 ]
 # do collect static after changing any static files
