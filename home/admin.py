@@ -59,3 +59,21 @@ class NumericResponseAdmin(admin.ModelAdmin):
 # admin.site.register(Questions, QuestionsAdmin)
 # admin.site.register(QuestionAnswers, QuestionAnswersAdmin)
 # admin.site.register(NumericResponse, NumericResponseAdmin)
+
+
+
+@admin.register(Notice)
+class NoticeAdmin(admin.ModelAdmin):
+    list_display = ('title', 'posted_on', 'posted_by')
+    search_fields = ('title', 'posted_by__username')
+
+@admin.register(NoticeStatus)
+class NoticeStatusAdmin(admin.ModelAdmin):
+    list_display = ('notice', 'employee', 'viewed', 'acknowledged', 'viewed_date', 'acknowledged_date')
+    search_fields = ('notice__title', 'employee__empname')
+
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+ 

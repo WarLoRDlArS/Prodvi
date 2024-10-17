@@ -5,10 +5,9 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Dashboard</title>
 
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico'%}">
-
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 
     <!-- Bootstrap-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -21,39 +20,101 @@
 </head>
 
 <body>
-    {% csrf_token %}
-
     <!-- Include navbar template -->
     {% include 'home/navbar.html' %}
 
+    <div class="container mt-5">
+        <div class="row justify-content-center">
 
-    <div style="display: flex; justify-content: center; align-content: center; margin-top: 5em;">
-        <div class="container col col-12 border border-secondary-subtle mx-1 my-1">
-            <label for="notice-list-on-home-page">Pending Forms: </label>
-            <div class=" row container-fluid py-2 mx-1" id="notice-list-on-home-page">
-                <div class="border border-secondary-subtle">
-                    {% if notices %}
-                    Top 5 Pending Forms
-                    {% else %}
-                    No Pending Forms
-                    {% endif %}
+            <!-- Pending Forms Section -->
+            <div class="col-lg-12 mb-4">
+                <div class="card border-secondary">
+                    <div class="card-header">
+                        <h5 class="card-title">Pending Forms</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if latest_forms %}
+                        <ul class="list-group">
+                            {% for form_info in latest_forms %}
+                            <li class="list-group-item">
+                                <strong>{{ form_info.form.title }}</strong>
+                                {% if not form_info.has_filled %} <!-- Check if the form is not filled -->
+                                <span class="badge bg-danger float-end">New</span> <!-- Red badge -->
+                                {% endif %}
+                                <br>
+                                Submission Date: {{ form_info.form.submission_date|date:"F j, Y" }}<br>
+                                Status: {{ form_info.form.get_status_display }} <!-- Show human-readable status -->
+                                <a href="#" class="btn btn-link btn-sm">View Form</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-muted">No pending forms at the moment.</p>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
-
-
-            <label for="notice-list-on-home-page">Notices For You:</label>
-            <div class="row container-fluid py-2 mx-1" id="notice-list-on-home-page">
-                <div class="border border-secondary-subtle">
-                    {% if notices %}
-                    Top 5 Notices List
-                    {% else %}
-                    No Notices for Now
-                    {% endif %}
+            <!-- Notices Section -->
+            <div class="col-lg-12 mb-4">
+                <div class="card border-secondary">
+                    <div class="card-header">
+                        <h5 class="card-title">Notices For You</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if new_notices %}
+                        <ul class="list-group">
+                            {% for notice_status in new_notices %}
+                            <li class="list-group-item">
+                                <strong>{{ notice_status.notice.title }}</strong>
+                                {% if not notice_status.acknowledged %} <!-- Check if the notice is unacknowledged -->
+                                <span class="badge bg-danger float-end">New</span> <!-- Red badge -->
+                                {% endif %}
+                                <br>
+                                Posted on: {{ notice_status.notice.posted_on|date:"F j, Y" }}<br>
+                                {{ notice_status.notice.content|truncatewords:20 }}
+                                <!-- Show a preview of the content -->
+                                <a href="{% url 'home:acknowledge_notice' notice_status.id %}"
+                                    class="btn btn-link btn-sm">Acknowledge</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-muted">No notices available for you.</p>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Memos Section (Optional) -->
+        {% if latest_memos %}
+        <div class="row justify-content-center">
+            <div class="col-lg-12 mb-4">
+                <div class="card border-secondary">
+                    <div class="card-header">
+                        <h5 class="card-title">Latest Memos</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for memo in latest_memos %}
+                            <li class="list-group-item">
+                                <strong>{{ memo.title }}</strong><br>
+                                Created on: {{ memo.created_at|date:"F j, Y" }}<br>
+                                {{ memo.content|truncatewords:20 }} <!-- Show a preview of the content -->
+                                <a href="#" class="btn btn-link btn-sm">Read Memo</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
+
+
+
 </body>
 
 </html>
