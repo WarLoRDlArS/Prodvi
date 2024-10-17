@@ -24,12 +24,14 @@
                         <li>
                             <hr class="dropdown-divider" />
                         </li>
+                        {% if employee.is_manager %}
                         <li>
                             <a class="dropdown-item" href="{% url 'home:createfeedbackform' %}">Create Feedback Form</a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="{% url 'home:view_forms' %}">View All Forms</a>
                         </li>
+                        {% endif %}
                     </ul>
                 </li>
             </ul>

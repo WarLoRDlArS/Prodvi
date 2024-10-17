@@ -15,8 +15,8 @@ from .forms import NoticeForm, FeedbackForm
 
 
 @login_required(login_url='users:login')
-def index(request):
-    # print("home:view-index View  : came here")
+def index(request): 
+
     return render(request, 'home/index.html')
 
 
@@ -27,26 +27,12 @@ def logout_link(request):
 
 
 @login_required(login_url='users:login')
-def user_profile(request):
-    # do all query stuff and all over here
-    if request.user.is_authenticated: 
-        current_user = Users.objects.get(pid=request.user.pid)  
-        employee = Employee.objects.filter(user = current_user).first()
-        role = 'Manager' if employee and employee.is_manager else 'Employee'
-        doj = employee.doj if employee and employee.doj else 'Not available'
+def user_profile(request): 
 
-    context = {
-            'user_role': role,  # Check if role exists
-            'employee': employee,
-            'doj':'doj',
-        }
-
-    return render(request, 'home/profile.html',context=context)
+    return render(request, 'home/profile.html')
 
 @login_required(login_url='users:login')
-def edit_profile(request):
-    current_user = request.user
-    employee = Employee.objects.get(user=current_user)
+def edit_profile(request): 
     
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -63,16 +49,12 @@ def edit_profile(request):
 
         messages.success(request, 'Profile updated successfully!')
         return redirect('home:userProfile')  # Redirect to profile page after saving
-    
-    context = {
-        'employee': employee,
-         'current_user': current_user,
-    }
-    return render(request, 'home/edit_profile.html', context)
+     
+    return render(request, 'home/edit_profile.html')
 
 
 @login_required(login_url='users:login')
-def createfeedbackform(request):
+def createfeedbackform(request):  
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
 
@@ -103,8 +85,8 @@ def createfeedbackform(request):
             return redirect('home:assign_form_to_group', form_id=form_instance.form_id)  # Update the URL name as needed
     else:
         form = FeedbackForm()
-
-    return render(request, 'home/createFormTemplate.html', {'form': form})
+ 
+    return render(request, 'home/createFormTemplate.html')
 
 
 @login_required
@@ -114,10 +96,7 @@ def NoticeView(request):
     is_manager = emp.is_manager
 
     print(f"User: {request.user.username}, is_manager: {is_manager}")
-    return render(request, 'home/notice.html', {
-        'notices': notices,
-        'is_manager': is_manager,
-    })
+    return render(request, 'home/notice.html', context={'notices': notices})
 
 @login_required(login_url='users:login')
 def add_notice(request):
@@ -159,10 +138,14 @@ def group_list(request):
 def assign_form_to_group(request, form_id):
     form = Forms.objects.get(form_id=form_id)
     assigned_users = []
+    print(request.POST)
     
     if request.method == 'POST':
         group_id = request.POST.get('group_id')
-        pid_list = request.POST.get('pids', '').split(',')
+        pid_list = request.POST.get('pids', '')
+
+        # Strip any extra whitespace and split by comma
+        pid_list = [pid.strip() for pid in pid_list.split(',') if pid.strip()]
 
         # Assign form to group if selected
         if group_id:
@@ -175,19 +158,19 @@ def assign_form_to_group(request, form_id):
             )
 
         # Assign form to users based on PIDs
+        current_user = Manager.objects.get(user=request.user)
         for pid in pid_list:
-            pid = pid.strip()
             try:
                 user = Users.objects.get(pid=pid)
                 FormAssignedByTo.objects.create(
-                    manager=request.user.employee.managerid,  # Ensure this is correct
+                    manager=current_user,  
                     form=form,
                     employee=user.employee,
                     assign_date=date.today()
                 )
                 assigned_users.append(user)
             except Users.DoesNotExist:
-                continue
+                print(f"Errorr Assigning form to {pid}")
 
         return redirect('home:index')
 
