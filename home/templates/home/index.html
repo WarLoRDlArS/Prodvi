@@ -44,7 +44,7 @@
                                 <br>
                                 Submission Date: {{ form_info.form.submission_date|date:"F j, Y" }}<br>
                                 Status: {{ form_info.form.get_status_display }} <!-- Show human-readable status -->
-                                <a href="#" class="btn btn-link btn-sm">View Form</a>
+                                <a href="{% url 'home:fill_feedback_form' form_info.form.form_id %}" class="btn btn-link btn-sm">View Form</a>
                             </li>
                             {% endfor %}
                         </ul>

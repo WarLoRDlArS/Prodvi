@@ -1,15 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Appraisal Form</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
 
-{% block content %}
-<h2>Fill Feedback Form: {{ form.title }}</h2>
-<form method="POST">
-    {% csrf_token %}
-    {% for question in questions %}
-        <div>
-            <label>{{ question.question_text }}</label>
-            <input type="text" name="question_{{ question.question_id }}" required>
-        </div>
-    {% endfor %}
-    <button type="submit">Submit</button>
-</form>
-{% endblock %}
+        .form-container {
+            max-width: 1000px;
+            /* Increased max-width for larger screens */
+            margin: 50px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .range-value {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar is Below -->
+    {% include 'home/navbar.html' %}
+
+    <div class="container form-container">
+        <h3>Appraisal Form</h3>
+        <form id="appraisalForm" method="POST">
+            {% csrf_token %}
+            {% for question in questions %}
+            <div class="mb-4">
+                <label for="question_{{ question.question_id }}" class="form-label">{{ question.question_text }}</label>
+                {% if question.question_type == 'numeric' %}
+                <input type="range" class="form-range" id="question_{{ question.question_id }}" min="0" max="100"
+                    step="10" value="0" oninput="updateRangeValue(this.value, '{{ question.question_id }}')">
+                <p>Selected Value: <span class="range-value" id="rangeValue_{{ question.question_id }}">0</span></p>
+                {% elif question.question_type == 'text' %}
+                <textarea class="form-control" id="question_{{ question.question_id }}" rows="4"
+                    placeholder="Answer the question." name="question_{{ question.question_id }}"></textarea>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary w-100">Submit</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateRangeValue(value, questionId) {
+            document.getElementById(`rangeValue_${questionId}`).textContent = value;
+        }
+    </script>
+
+</body>
+
+</html>

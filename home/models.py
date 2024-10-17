@@ -36,6 +36,7 @@ class Manager(models.Model):
     def __str__(self):
         return f"Manager {self.user.username} ({self.managerid})"
 
+
 class Department(models.Model):
     deptid = models.PositiveIntegerField(primary_key=True)
     dept_name = models.CharField(max_length=255)
@@ -43,6 +44,7 @@ class Department(models.Model):
 
     def __str__(self):
         return self.dept_name
+
 
 class Forms(models.Model):
     FORM_STATUS_CHOICES = [
@@ -72,15 +74,19 @@ class Questions(models.Model):
     question_type = models.CharField(max_length=10, choices=QUESTION_TYPE_CHOICES)
     question_id = models.AutoField(primary_key=True)
     question_text = models.TextField()
+    min_value = models.FloatField(null=True, blank=True)  # Add this field for numeric questions
+    max_value = models.FloatField(null=True, blank=True)  # Add this field for numeric questions
 
     def __str__(self):
         return self.question_text
+
 
 class QuestionAnswers(models.Model):
     answer_id = models.AutoField(primary_key=True)
     question = models.ForeignKey(Questions, on_delete=models.CASCADE)
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     answer_text = models.TextField()
+
 
 class NumericResponse(models.Model):
     answer_value = models.FloatField()
@@ -89,6 +95,7 @@ class NumericResponse(models.Model):
 
     def __str__(self):
         return f"Response by {self.user.username} with value {self.answer_value}"
+
 
 class Notice(models.Model):
     title = models.CharField(max_length=200)
@@ -120,6 +127,7 @@ class Group(models.Model):
     def __str__(self):
         return self.name
 
+
 class FormAssignedByTo(models.Model):
     manager = models.ForeignKey(Manager, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True)
@@ -131,6 +139,8 @@ class FormAssignedByTo(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True)
     class Meta:
         unique_together = ('form', 'employee')   # Optional for direct assignments
+
+
 class FilledForm(models.Model):
     form = models.ForeignKey(Forms, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)

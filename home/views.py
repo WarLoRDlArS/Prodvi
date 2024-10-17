@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from django.contrib.auth import logout
 from django.shortcuts import redirect 
 from django.utils import timezone  # Import the timezone module
-
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 
 
@@ -44,7 +44,7 @@ def index(request):
                 'has_filled': assigned_form.has_filled
             }
             latest_forms.append(form_info)
-
+        print(latest_forms)
         # Fetch memos (assuming you have a `Memo` model), if not you can skip this part
         # latest_memos = Memo.objects.order_by('-created_at')[:5] if Memo.objects.exists() else None
 
@@ -95,8 +95,9 @@ def edit_profile(request):
     return render(request, 'home/edit_profile.html')
 
 
+# TODO Test The below 
 @login_required(login_url='users:login')
-def createfeedbackform(request):  
+def createfeedbackform(request):
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
 
@@ -107,28 +108,59 @@ def createfeedbackform(request):
 
             # Initialize lists for question texts and types
             questions = []
+            errors = []  # To store any validation errors
+
             for key in request.POST:
                 if key.startswith('question_text_'):
                     index = key.split('_')[-1]  # Get the question number
                     question_text = request.POST.get(key)
                     question_type = request.POST.get(f'question_type_{index}')
-                    questions.append((question_text, question_type))
+                    min_value = request.POST.get(f'min_value_{index}', None)  # Get min value if provided
+                    max_value = request.POST.get(f'max_value_{index}', None)  # Get max value if provided
 
-            # Loop through the questions and save them
-            for question_text, question_type in questions:
-                if question_text:  # Ensure that the question text is not empty
-                    Questions.objects.create(
-                        form=form_instance,
-                        question_text=question_text,
-                        question_type=question_type
-                    )
+                    # Handle min_value and max_value for numeric questions
+                    if question_type == 'numeric':
+                        # Default to infinity if not provided
+                        min_value = float('-inf') if not min_value else min_value
+                        max_value = float('inf') if not max_value else max_value
 
-            # Redirect to assign form template after creation
-            return redirect('home:assign_form_to_group', form_id=form_instance.form_id)  # Update the URL name as needed
+                        try:
+                            # Validate if the input is numeric
+                            min_value = float(min_value)
+                            max_value = float(max_value)
+
+                            if min_value > max_value:
+                                raise ValidationError("Min value cannot be greater than max value.")
+                            
+                        except ValueError:
+                            errors.append(f"Non-numeric values entered for min/max values in question {index}.")
+                    else:
+                        min_value, max_value = None, None  # Set to None for non-numeric questions
+
+                    questions.append((question_text, question_type, min_value, max_value))
+
+            # If there are any errors, display them back to the user
+            if errors:
+                form.add_error(None, " ".join(errors))
+            else:
+                # Loop through the questions and save them
+                for question_text, question_type, min_value, max_value in questions:
+                    if question_text:  # Ensure that the question text is not empty
+                        Questions.objects.create(
+                            form=form_instance,
+                            question_text=question_text,
+                            question_type=question_type,
+                            min_value=min_value,  # Save the min value, can be None
+                            max_value=max_value   # Save the max value, can be None
+                        )
+
+                # Redirect to assign form template after creation
+                return redirect('home:assign_form_to_group', form_id=form_instance.form_id)  # Update the URL name as needed
+
     else:
         form = FeedbackForm()
- 
-    return render(request, 'home/createFormTemplate.html')
+
+    return render(request, 'home/createFormTemplate.html', {'form': form})
 
 
 @login_required(login_url='users:login')
@@ -276,6 +308,7 @@ def assign_form_to_group(request, form_id):
     groups = Group.objects.filter(managers=request.user.employee.managerid)
     return render(request, 'home/assign_form.html', {'form': form, 'groups': groups, 'assigned_users': assigned_users})
 
+
 @login_required(login_url='users:login')
 def view_forms(request):
     forms = Forms.objects.all()  # Get all forms
@@ -299,6 +332,7 @@ def assigned_forms(request):
 
     return render(request, 'home/assigned_forms.html', {'assigned_forms': assigned_forms})
 
+
 @login_required(login_url='users:login')
 def fill_feedback_form(request, form_id):
     # Fetch the form based on the form_id
@@ -316,6 +350,7 @@ def fill_feedback_form(request, form_id):
 
     if request.method == 'POST':
         for question in questions:
+            # Use the correct field name for text responses and the range input
             answer_text = request.POST.get(f'question_{question.question_id}')
             if answer_text:
                 QuestionAnswers.objects.create(
@@ -323,7 +358,7 @@ def fill_feedback_form(request, form_id):
                     user=request.user,
                     answer_text=answer_text
                 )
-        
+
         # Create a FilledForm entry
         FilledForm.objects.create(
             form=form_instance,
@@ -338,10 +373,8 @@ def fill_feedback_form(request, form_id):
         messages.success(request, "Your responses have been submitted successfully!")
         return redirect('home:index')
 
-    return render(request, 'home/fill_feedback_form.html', {
-        'form': form_instance,
-        'questions': questions
-    })
+    return render(request, 'home/fill_feedback_form.html', {'form': form_instance, 'questions': questions })
+
 
 @login_required(login_url='users:login')
 def filled_forms(request):
