@@ -8,7 +8,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item border border-secondary-subtle rounded mx-1 my-1">
-                    <a class="nav-link active" href="{% url 'home:notice' %}">Notices</a>
+                    <a class="nav-link active" href="{% url 'home:employee_notices' %}">New Notices</a>
                 </li>
                 <li class="nav-item border border-danger-subtle rounded mx-1 my-1">
                     <a class="nav-link active text-danger" href="#">Memo</a>
@@ -19,8 +19,15 @@
                         Forms
                     </a>
                     <ul class="dropdown-menu">
+<<<<<<< HEAD
                         <li><a class="dropdown-item" href="{% url 'home:assigned_forms' %}">Forms For Me</a></li>
                         <li><a class="dropdown-item" href="{% url 'home:filled_forms' %}">Filled Forms</a></li>
+=======
+                        <li><a class="dropdown-item" href="#">Forms For Me</a></li>
+                        <li><a class="dropdown-item" href="#">Filled Forms</a></li>
+                        <li><a class="dropdown-item" href="{% url 'home:notice' %}">Notices</a></li>
+                        <li><a class="dropdown-item" href="#">View Memos</a></li>
+>>>>>>> 8ef3b5169a606349e36f194ae0e28b09e32a91ac
                         <li>
                             <hr class="dropdown-divider" />
                         </li>

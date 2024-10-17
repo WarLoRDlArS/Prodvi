@@ -99,6 +99,19 @@ class Notice(models.Model):
     def __str__(self):
         return self.title
 
+
+class NoticeStatus(models.Model):
+    notice = models.ForeignKey(Notice, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    viewed = models.BooleanField(default=False)
+    acknowledged = models.BooleanField(default=False)
+    viewed_date = models.DateTimeField(null=True, blank=True)
+    acknowledged_date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Notice {self.notice.title} - {self.employee.empname}"
+
+
 class Group(models.Model):
     name = models.CharField(max_length=255)
     managers = models.ManyToManyField(Manager, related_name='managed_groups')

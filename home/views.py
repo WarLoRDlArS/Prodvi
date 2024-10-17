@@ -2,23 +2,63 @@ from django.shortcuts import render,get_object_or_404
 from datetime import date
 from django.contrib import messages
 from django.db import transaction
+
 # Create your views here.
 from django.template import TemplateDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.contrib.auth import logout
 from django.shortcuts import redirect 
+from django.utils import timezone  # Import the timezone module
+
+from django.db.models import Q
+
 
 from .models import *
 from users.models import Users
 
-from .forms import NoticeForm, FeedbackForm
+from .forms import NoticeForm, FeedbackForm 
 
-
+ 
 @login_required(login_url='users:login')
-def index(request): 
+def index(request):
+    try:
+        # Get the current employee
+        employee = Employee.objects.get(user=request.user)
 
-    return render(request, 'home/index.html')
+        # Fetch the top 5 new (unacknowledged) notices for the employee
+        new_notices = NoticeStatus.objects.filter(employee=employee, acknowledged=False).order_by('-notice__posted_on')[:5]
+
+        # If there are no new notices, fetch the latest assigned notices
+        if not new_notices.exists():
+            new_notices = NoticeStatus.objects.filter(employee=employee).order_by('-notice__posted_on')[:5]
+
+        # Fetch the top 5 assigned forms for the employee
+        assigned_forms = FormAssignedByTo.objects.filter(employee=employee).order_by('-assign_date')[:5]
+
+        # Fetching forms and determining if they are filled
+        latest_forms = []
+        for assigned_form in assigned_forms:
+            form_info = {
+                'form': assigned_form.form,
+                'has_filled': assigned_form.has_filled
+            }
+            latest_forms.append(form_info)
+
+        # Fetch memos (assuming you have a `Memo` model), if not you can skip this part
+        # latest_memos = Memo.objects.order_by('-created_at')[:5] if Memo.objects.exists() else None
+
+        context = {
+            'new_notices': new_notices, 
+            'latest_forms': latest_forms,
+            # 'latest_memos': latest_memos,
+        } 
+
+        return render(request, 'home/index.html', context)
+    except Employee.DoesNotExist:
+        # Handle the case where the employee does not exist
+        return render(request, 'users/landing_page.html')
+
 
 
 @login_required(login_url='users:login')
@@ -31,6 +71,7 @@ def logout_link(request):
 def user_profile(request): 
 
     return render(request, 'home/profile.html')
+
 
 @login_required(login_url='users:login')
 def edit_profile(request): 
@@ -90,14 +131,19 @@ def createfeedbackform(request):
     return render(request, 'home/createFormTemplate.html')
 
 
-@login_required
+@login_required(login_url='users:login')
 def NoticeView(request):
-    notices = Notice.objects.all()
     emp = Employee.objects.get(user=request.user)
     is_manager = emp.is_manager
 
+    # Get notices created by the logged-in user or assigned to the logged-in employee
+    notices = Notice.objects.filter(
+        Q(posted_by=request.user) | Q(noticestatus__employee=emp)
+    ).distinct().order_by('-posted_on')
+
     print(f"User: {request.user.username}, is_manager: {is_manager}")
     return render(request, 'home/notice.html', context={'notices': notices})
+
 
 @login_required(login_url='users:login')
 def add_notice(request):
@@ -111,12 +157,58 @@ def add_notice(request):
             notice = form.save(commit=False)
             notice.posted_by = request.user  # Set the user who posted the notice
             notice.save()
+
+            # Assign notice to selected group or individual employees (like assigning a form)
+            group_id = request.POST.get('group_id')
+            pid_list = request.POST.get('pids', '')
+
+            # Assign notice to group members
+            if group_id:
+                group = Group.objects.get(id=group_id)
+                for employee in group.employees.all():
+                    NoticeStatus.objects.create(notice=notice, employee=employee)
+
+            # Assign notice to users based on PIDs
+            pid_list = [pid.strip() for pid in pid_list.split(',') if pid.strip()]
+            for pid in pid_list:
+                try:
+                    user = Users.objects.get(pid=pid)
+                    employee = Employee.objects.get(user=user)
+                    NoticeStatus.objects.create(notice=notice, employee=employee)
+                except Users.DoesNotExist:
+                    continue
+
             return redirect('home:notice')  # Redirect to the notices page
     else:
         form = NoticeForm()
-    return render(request, 'home/add_notice.html', {'form': form})
+
+    groups = Group.objects.filter(managers=currentuseremp.managerid)
+
+    return render(request, 'home/add_notice.html', {'form': form, 'groups': groups})
 
 
+# TODO
+@login_required(login_url='users:login')
+def employee_notices(request):
+    employee = Employee.objects.get(user=request.user)
+
+    # Get all notices assigned to the employee that are not acknowledged
+    new_notices = NoticeStatus.objects.filter(employee=employee, acknowledged=False)
+
+    return render(request, 'home/employee_notices.html', {'new_notices': new_notices})
+
+
+@login_required(login_url='users:login')
+def acknowledge_notice(request, notice_status_id):
+    notice_status = NoticeStatus.objects.get(id=notice_status_id, employee__user=request.user)
+    notice_status.acknowledged = True
+    notice_status.acknowledged_date = timezone.now()
+    notice_status.save()
+
+    return redirect('home:employee_notices')
+
+
+# TODO
 @login_required(login_url='users:login')
 def create_group(request):
     if request.method == 'POST':
@@ -129,6 +221,8 @@ def create_group(request):
 
     return render(request, 'create_group.html')
 
+
+# TODO
 @login_required(login_url='users:login')
 def group_list(request):
     groups = Group.objects.filter(managers=request.user.employee.managerid)
