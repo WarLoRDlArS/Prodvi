@@ -109,9 +109,19 @@ class Group(models.Model):
 
 class FormAssignedByTo(models.Model):
     manager = models.ForeignKey(Manager, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True)
     form = models.ForeignKey(Forms, on_delete=models.CASCADE)
     assign_date = models.DateField()
     has_filled = models.BooleanField(default=False)
     has_viewed = models.BooleanField(default=False)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)  # Link to group
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True)  # Optional for direct assignments
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True)
+    class Meta:
+        unique_together = ('form', 'employee')   # Optional for direct assignments
+class FilledForm(models.Model):
+    form = models.ForeignKey(Forms, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    filled_date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Filled {self.form.title} by {self.employee.empname}"

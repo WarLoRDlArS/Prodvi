@@ -1,0 +1,15 @@
+
+
+{% block content %}
+<h2>Fill Feedback Form: {{ form.title }}</h2>
+<form method="POST">
+    {% csrf_token %}
+    {% for question in questions %}
+        <div>
+            <label>{{ question.question_text }}</label>
+            <input type="text" name="question_{{ question.question_id }}" required>
+        </div>
+    {% endfor %}
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}

@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 from datetime import date
 from django.contrib import messages
+from django.db import transaction
 # Create your views here.
-
+from django.template import TemplateDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.contrib.auth import logout
@@ -138,7 +139,6 @@ def group_list(request):
 def assign_form_to_group(request, form_id):
     form = Forms.objects.get(form_id=form_id)
     assigned_users = []
-    print(request.POST)
     
     if request.method == 'POST':
         group_id = request.POST.get('group_id')
@@ -150,27 +150,31 @@ def assign_form_to_group(request, form_id):
         # Assign form to group if selected
         if group_id:
             group = Group.objects.get(id=group_id)
-            FormAssignedByTo.objects.create(
-                manager=request.user.employee.managerid,
-                form=form,
-                group=group,
-                assign_date=date.today()
-            )
+            # Check if the form is already assigned to the group
+            if not FormAssignedByTo.objects.filter(manager=request.user.employee.managerid, form=form, group=group).exists():
+                FormAssignedByTo.objects.create(
+                    manager=request.user.employee.managerid,
+                    form=form,
+                    group=group,
+                    assign_date=date.today()
+                )
 
         # Assign form to users based on PIDs
         current_user = Manager.objects.get(user=request.user)
         for pid in pid_list:
             try:
                 user = Users.objects.get(pid=pid)
-                FormAssignedByTo.objects.create(
-                    manager=current_user,  
-                    form=form,
-                    employee=user.employee,
-                    assign_date=date.today()
-                )
-                assigned_users.append(user)
+                # Check if the form is already assigned to the user
+                if not FormAssignedByTo.objects.filter(manager=current_user, form=form, employee=user.employee).exists():
+                    FormAssignedByTo.objects.create(
+                        manager=current_user,
+                        form=form,
+                        employee=user.employee,
+                        assign_date=date.today()
+                    )
+                    assigned_users.append(user)
             except Users.DoesNotExist:
-                print(f"Errorr Assigning form to {pid}")
+                print(f"Error assigning form to {pid}")
 
         return redirect('home:index')
 
@@ -178,10 +182,76 @@ def assign_form_to_group(request, form_id):
     groups = Group.objects.filter(managers=request.user.employee.managerid)
     return render(request, 'home/assign_form.html', {'form': form, 'groups': groups, 'assigned_users': assigned_users})
 
-
 @login_required(login_url='users:login')
 def view_forms(request):
     forms = Forms.objects.all()  # Get all forms
     return render(request, 'home/view_forms.html', context={'forms': forms})
 
 
+@login_required(login_url='users:login')
+def assigned_forms(request):
+    # Get the employee associated with the logged-in user
+    employee = get_object_or_404(Employee, user=request.user)
+
+    # Fetch all forms assigned to this employee
+    assigned_forms = FormAssignedByTo.objects.filter(employee=employee).select_related('form')
+
+    # Update form status if the employee has viewed the form
+    for assignment in assigned_forms:
+        if not assignment.has_viewed:
+            assignment.has_viewed = True
+            assignment.form.status = 'pending'  # Update status to 'pending'
+            assignment.save()  # Save changes
+
+    return render(request, 'home/assigned_forms.html', {'assigned_forms': assigned_forms})
+
+@login_required(login_url='users:login')
+def fill_feedback_form(request, form_id):
+    # Fetch the form based on the form_id
+    form_instance = Forms.objects.get(form_id=form_id)
+
+    # Ensure the logged-in employee has access to this form
+    employee = Employee.objects.get(user=request.user)
+    assignment = FormAssignedByTo.objects.filter(form=form_instance, employee=employee).first()
+
+    if not assignment:
+        messages.error(request, "You do not have permission to fill this form.")
+        return redirect('home:index')
+
+    questions = Questions.objects.filter(form=form_instance)
+
+    if request.method == 'POST':
+        for question in questions:
+            answer_text = request.POST.get(f'question_{question.question_id}')
+            if answer_text:
+                QuestionAnswers.objects.create(
+                    question=question,
+                    user=request.user,
+                    answer_text=answer_text
+                )
+        
+        # Create a FilledForm entry
+        FilledForm.objects.create(
+            form=form_instance,
+            employee=employee
+        )
+
+        # Remove the assignment and update the form status
+        assignment.delete()
+        form_instance.status = 'finished'
+        form_instance.save()
+
+        messages.success(request, "Your responses have been submitted successfully!")
+        return redirect('home:index')
+
+    return render(request, 'home/fill_feedback_form.html', {
+        'form': form_instance,
+        'questions': questions
+    })
+
+@login_required(login_url='users:login')
+def filled_forms(request):
+    employee = Employee.objects.get(user=request.user)
+    filled_forms = FilledForm.objects.filter(employee=employee).select_related('form')
+
+    return render(request, 'home/filled_forms.html', {'filled_forms': filled_forms})

@@ -1,0 +1,63 @@
+{% block content %}
+<style>
+    .form-table {
+        width: 100%; /* Full width */
+        border-collapse: collapse; /* Merge borders */
+        margin-top: 20px; /* Margin above the table */
+    }
+
+    .form-table th, .form-table td {
+        border: 1px solid #dee2e6; /* Border for cells */
+        padding: 10px; /* Padding inside cells */
+        text-align: left; /* Align text to the left */
+    }
+
+    .form-table th {
+        background-color: #f8f9fa; /* Light background for header */
+        font-weight: bold; /* Bold header text */
+    }
+
+    .form-table tr:nth-child(even) {
+        background-color: #f2f2f2; /* Zebra stripe effect for even rows */
+    }
+
+    .form-table tr:hover {
+        background-color: #e2e6ea; /* Change background on hover */
+    }
+
+    .form-table a {
+        color: #007bff; /* Link color */
+        text-decoration: none; /* Remove underline from links */
+    }
+
+    .form-table a:hover {
+        color: #0056b3; /* Darker link color on hover */
+    }
+</style>
+
+<h2>Forms Assigned to Me</h2>
+<table class="form-table">
+    <thead>
+        <tr>
+            <th>Form Title</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for assignment in assigned_forms %}
+            <tr>
+                <td>
+                    <a href="{% url 'home:fill_feedback_form' assignment.form.form_id %}">
+                        {{ assignment.form.title }}
+                    </a>
+                </td>
+                <td>{{ assignment.form.status }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="2">No forms assigned.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

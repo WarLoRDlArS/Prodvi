@@ -16,4 +16,10 @@ urlpatterns = [
     path('assign-form/<int:form_id>/', views.assign_form_to_group, name='assign_form_to_group'),
     path('edit_profile/', views.edit_profile, name='edit_profile'),
     path('forms/', views.view_forms, name='view_forms'),
+    path('assigned_forms/', views.assigned_forms, name='assigned_forms'),
+    path('fill_feedback_form/<int:form_id>/', views.fill_feedback_form, name='fill_feedback_form'),
+    path('filled_forms/', views.filled_forms, name='filled_forms'),
+
+    
+
 ]
