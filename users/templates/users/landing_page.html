@@ -82,7 +82,8 @@
 
     .section {
       padding: 40px;
-      background-image: url("https://t4.ftcdn.net/jpg/05/04/84/75/360_F_504847577_CFVb63kJEBe2MAdWWTHmwzPfKwS9Un3p.jpg");;
+      background-image: url("https://t4.ftcdn.net/jpg/05/04/84/75/360_F_504847577_CFVb63kJEBe2MAdWWTHmwzPfKwS9Un3p.jpg");
+      ;
       margin-top: 60px;
       /* Added margin to push content below fixed navbar */
     }
@@ -241,6 +242,102 @@
       margin-top: 10px;
       font-style: italic;
     }
+
+    .carousel-inner img {
+      width: 100%;
+      height: 100vh;
+      object-fit: cover;
+      background-color: #bef4ff;
+      /* Ensures the images cover the carousel area */
+    }
+
+    .carousel-inner1 img {
+      width: 100%;
+      height: 100vh;
+      object-fit: cover;
+      background-color: #ffd55f;
+      /* Ensures the images cover the carousel area */
+    }
+
+    .carousel-inner2 img {
+      width: 100%;
+      height: 100vh;
+      object-fit: cover;
+      background-color: #a9b72e;
+      /* Ensures the images cover the carousel area */
+    }
+
+    .carousel-caption {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      text-align: center;
+      z-index: 10;
+      background-color: transparent;
+      padding: 20px;
+      animation: slideIn 1s ease-in;
+    }
+
+    .carousel-caption h1 {
+      font-size: 3rem;
+      font-weight: bold;
+    }
+
+    .carousel-caption p {
+      font-size: 1.5rem;
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    .carousel-caption1 {
+      position: absolute;
+      top: 48%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: black;
+      text-align: center;
+      z-index: 10;
+      background-color: transparent;
+      padding: 20px;
+      animation: slideIn 1s ease-in;
+    }
+
+    .carousel-caption1 h1 {
+      font-size: 3rem;
+      font-weight: bold;
+    }
+
+    .carousel-caption1 p {
+      font-size: 1.5rem;
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    .carousel-caption2 {
+      position: absolute;
+      top: 48%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgb(255, 255, 255);
+      text-align: center;
+      z-index: 10;
+      background-color: transparent;
+      padding: 20px;
+      animation: slideIn 1s ease-in;
+    }
+
+    .carousel-caption2 h1 {
+      font-size: 3rem;
+      font-weight: bold;
+    }
+
+    .carousel-caption2 p {
+      font-size: 1.5rem;
+      margin-top: 10px;
+      font-style: italic;
+    }
   </style>
 </head>
 
@@ -248,43 +345,68 @@
 
   {% csrf_token %}
 
-  <div class="image-container">
-    <img src="https://odblogs.zohowebstatic.com/sites/qntrl-blog/files/qntrl-blog/performance_review_feature_image.jpg"
-      alt="Background Image" />
-    <div class="overlay-text">
-      <h1>Welcome to Prodvi</h1>
-      <p>Redefining the future of work.</p>
-    </div>
-    <div class="header">
-      <nav class="navbar navbar-expand-lg fixed-top"> <!-- Added fixed-top class -->
-        <div class="container">
-          <a class="navbar-brand" href="#">
-            Prodvi
-          </a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-              <li class="nav-item">
-                <a class="nav-link" href="#about1">About</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#faq">FAQ</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'users:login' %}">Login</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'users:signup' %}">Sign Up</a>
-              </li>
-            </ul>
+  <div id="landingCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img
+          src="https://i.pinimg.com/originals/70/67/c2/7067c29f2c2336c23c827cfda44e7c61.gif"
+          alt="First Slide">
+        <div class="carousel-caption">
+          <h1>Welcome to Prodvi</h1>
+          <p>Redefining the future of work.</p>
+        </div>
+      </div>
+      <div class="carousel-inner1">
+        <div class="carousel-item">
+         <img
+          src="https://media3.giphy.com/media/NUnUoXSEpcB3uW34Je/giphy.gif?cid=6c09b952dkqvi3pypiy4d7lh50xm82ppo546tox7upr8i9hg&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=g"
+          alt="Second Slide">
+          <div class="carousel-caption1">
+          <h1>Empowering Workspaces</h1>
+          <p>Building a collaborative and efficient work environment.</p>
           </div>
         </div>
-      </nav>
+      </div>
+      <div class="carousel-inner2">
+        <div class="carousel-item">
+          <img src="https://media1.giphy.com/headers/clubdoauto/fjDIBvQjjE3G.gif"
+          alt="Third Slide">
+          <div class="carousel-caption2">
+          <h1>Innovative HR Solutions</h1>
+          <p>Streamlining HR processes with cutting-edge technology.</p>
+          </div>
+        </div>
+      </div>
     </div>
+    <!-- Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#landingCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#landingCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
   </div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Prodvi</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#about1">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'users:login' %}">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'users:signup' %}">Sign Up</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
   <div class="section" id="about1">
     <div class="vision">
