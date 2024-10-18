@@ -346,20 +346,39 @@ def fill_feedback_form(request, form_id):
         messages.error(request, "You do not have permission to fill this form.")
         return redirect('home:index')
 
+    # Fetch all questions related to the form
     questions = Questions.objects.filter(form=form_instance)
 
     if request.method == 'POST':
         for question in questions:
-            # Use the correct field name for text responses and the range input
-            answer_text = request.POST.get(f'question_{question.question_id}')
-            if answer_text:
-                QuestionAnswers.objects.create(
-                    question=question,
-                    user=request.user,
-                    answer_text=answer_text
-                )
+            answer_key = f'question_{question.question_id}'
+            if question.question_type == 'text':
+                # For text questions, save the answer as text
+                answer_text = request.POST.get(answer_key)
+                if answer_text:
+                    QuestionAnswers.objects.create(
+                        question=question,
+                        user=request.user,
+                        answer_text=answer_text
+                    )
+            elif question.question_type == 'numeric':
+                # For numeric questions, save the numeric response
+                answer_value = request.POST.get(answer_key)
+                if answer_value:
+                    # First, create a QuestionAnswers entry
+                    answer_entry = QuestionAnswers.objects.create(
+                        question=question,
+                        user=request.user,
+                        answer_text=''  # Optional: empty since numeric responses are in a separate model
+                    )
+                    # Then, create a NumericResponse entry
+                    NumericResponse.objects.create(
+                        answer=answer_entry,
+                        user=request.user,
+                        answer_value=float(answer_value)  # Save as float
+                    )
 
-        # Create a FilledForm entry
+        # Create a FilledForm entry after form submission
         FilledForm.objects.create(
             form=form_instance,
             employee=employee
@@ -373,7 +392,8 @@ def fill_feedback_form(request, form_id):
         messages.success(request, "Your responses have been submitted successfully!")
         return redirect('home:index')
 
-    return render(request, 'home/fill_feedback_form.html', {'form': form_instance, 'questions': questions })
+    return render(request, 'home/fill_feedback_form.html', {'form': form_instance, 'questions': questions})
+
 
 
 @login_required(login_url='users:login')

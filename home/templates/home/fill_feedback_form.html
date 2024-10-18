@@ -46,9 +46,13 @@
             <div class="mb-4">
                 <label for="question_{{ question.question_id }}" class="form-label">{{ question.question_text }}</label>
                 {% if question.question_type == 'numeric' %}
-                <input type="range" class="form-range" id="question_{{ question.question_id }}" min="0" max="100"
-                    step="10" value="0" oninput="updateRangeValue(this.value, '{{ question.question_id }}')">
-                <p>Selected Value: <span class="range-value" id="rangeValue_{{ question.question_id }}">0</span></p>
+                <input type="range" class="form-range" id="question_{{ question.question_id }}"
+                    name="question_{{ question.question_id }}"
+                    min="{{ question.min_value|default_if_none:0 }}" 
+                    max="{{ question.max_value|default_if_none:100 }}" 
+                    step="1" value="{{ question.min_value|default_if_none:0 }}"
+                    oninput="updateRangeValue(this.value, '{{ question.question_id }}')">
+                <p>Selected Value: <span class="range-value" id="rangeValue_{{ question.question_id }}">{{ question.min_value|default_if_none:0 }}</span></p>
                 {% elif question.question_type == 'text' %}
                 <textarea class="form-control" id="question_{{ question.question_id }}" rows="4"
                     placeholder="Answer the question." name="question_{{ question.question_id }}"></textarea>

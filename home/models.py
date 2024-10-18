@@ -74,11 +74,12 @@ class Questions(models.Model):
     question_type = models.CharField(max_length=10, choices=QUESTION_TYPE_CHOICES)
     question_id = models.AutoField(primary_key=True)
     question_text = models.TextField()
-    min_value = models.FloatField(null=True, blank=True)  # Add this field for numeric questions
-    max_value = models.FloatField(null=True, blank=True)  # Add this field for numeric questions
+    min_value = models.FloatField(null=True, blank=True)  # Min value for numeric questions
+    max_value = models.FloatField(null=True, blank=True)  # Max value for numeric questions
 
     def __str__(self):
         return self.question_text
+
 
 
 class QuestionAnswers(models.Model):
