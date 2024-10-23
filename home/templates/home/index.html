@@ -9,14 +9,55 @@
 
     <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 
-    <!-- Bootstrap-->
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-    <!-- -->
-
+    
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f7e7ce; /* Light beige background */
+            color: #333;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 10px;
+            border: none; /* Remove default border for a cleaner look */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        .card-header {
+            background-color: #090909; /* Soft brown for headers */
+            color: white;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .list-group-item {
+            transition: background-color 0.3s ease;
+            background-color: #fff; /* White background for list items */
+        }
+        .list-group-item:hover {
+            background-color: #f0e4d7; /* Light beige hover effect */
+        }
+        .badge {
+            transition: transform 0.3s ease;
+        }
+        .badge:hover {
+            transform: scale(1.1);
+        }
+        h5.card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        p.text-muted {
+            font-style: italic;
+        }
+    </style>
 </head>
 
 <body>
@@ -38,12 +79,12 @@
                             {% for form_info in latest_forms %}
                             <li class="list-group-item">
                                 <strong>{{ form_info.form.title }}</strong>
-                                {% if not form_info.has_filled %} <!-- Check if the form is not filled -->
-                                <span class="badge bg-danger float-end">New</span> <!-- Red badge -->
+                                {% if not form_info.has_filled %} 
+                                <span class="badge bg-danger float-end">New</span>
                                 {% endif %}
                                 <br>
                                 Submission Date: {{ form_info.form.submission_date|date:"F j, Y" }}<br>
-                                Status: {{ form_info.form.get_status_display }} <!-- Show human-readable status -->
+                                Status: {{ form_info.form.get_status_display }}
                                 <a href="{% url 'home:fill_feedback_form' form_info.form.form_id %}" class="btn btn-link btn-sm">View Form</a>
                             </li>
                             {% endfor %}
@@ -67,15 +108,13 @@
                             {% for notice_status in new_notices %}
                             <li class="list-group-item">
                                 <strong>{{ notice_status.notice.title }}</strong>
-                                {% if not notice_status.acknowledged %} <!-- Check if the notice is unacknowledged -->
-                                <span class="badge bg-danger float-end">New</span> <!-- Red badge -->
+                                {% if not notice_status.acknowledged %} 
+                                <span class="badge bg-danger float-end">New</span>
                                 {% endif %}
                                 <br>
                                 Posted on: {{ notice_status.notice.posted_on|date:"F j, Y" }}<br>
                                 {{ notice_status.notice.content|truncatewords:20 }}
-                                <!-- Show a preview of the content -->
-                                <a href="{% url 'home:acknowledge_notice' notice_status.id %}"
-                                    class="btn btn-link btn-sm">Acknowledge</a>
+                                <a href="{% url 'home:acknowledge_notice' notice_status.id %}" class="btn btn-link btn-sm">Acknowledge</a>
                             </li>
                             {% endfor %}
                         </ul>
@@ -101,7 +140,7 @@
                             <li class="list-group-item">
                                 <strong>{{ memo.title }}</strong><br>
                                 Created on: {{ memo.created_at|date:"F j, Y" }}<br>
-                                {{ memo.content|truncatewords:20 }} <!-- Show a preview of the content -->
+                                {{ memo.content|truncatewords:20 }}
                                 <a href="#" class="btn btn-link btn-sm">Read Memo</a>
                             </li>
                             {% endfor %}
@@ -112,9 +151,7 @@
         </div>
         {% endif %}
     </div>
-
-
-
+    
 </body>
 
 </html>

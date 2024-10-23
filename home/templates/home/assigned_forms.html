@@ -4,16 +4,35 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
 <style>
-    /* Additional custom styles, if needed */
+    /* Additional custom styles */
+    body {
+        background-color: #f7e7ce; /* Light beige background */
+        color: #333; /* Text color */
+    }
+
+    h2 {
+        color: #090909; /* Soft brown for headings */
+    }
+
+    .table {
+        border-radius: 10px; /* Rounded corners */
+        overflow: hidden; /* Ensure border radius is applied */
+    }
+
     .table-hover tbody tr:hover {
-        background-color: #e2e6ea; /* Change background on hover */
+        background-color: #f0e4d7; /* Light beige hover effect */
+    }
+
+    .table thead th {
+        background-color: #090909; /* Dark header color */
+        color: white; /* Header text color */
     }
 </style>
 
 <!-- Include navbar template -->
 {% include 'home/navbar.html' %}
 
-<h2>Forms Assigned to Me</h2>
+<h2 class="text-center mt-4">Forms Assigned to Me</h2>
 <div class="container mt-4">
 
     <table class="table table-bordered table-striped table-hover">
@@ -35,7 +54,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="2">No forms assigned.</td>
+                <td colspan="2" class="text-center">No forms assigned.</td>
             </tr>
             {% endfor %}
         </tbody>

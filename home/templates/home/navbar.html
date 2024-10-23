@@ -1,38 +1,37 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-lg" style="background-color: #000000;">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">Prodvi</a>
+        <a class="navbar-brand" style="color: #fefefe;" href="/">Prodvi</a> <!-- Dark text for brand -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item border border-secondary-subtle rounded mx-1 my-1">
-                    <a class="nav-link active" href="{% url 'home:employee_notices' %}">New Notices</a>
+                <li class="nav-item">
+                    <a class="nav-link" style="color: #ffffff;" href="{% url 'home:employee_notices' %}">New Notices</a> <!-- Dark text -->
                 </li>
-                <li class="nav-item border border-danger-subtle rounded mx-1 my-1">
-                    <a class="nav-link active text-danger" href="#">Memo</a>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="#">Memo</a>
                 </li>
-                <li class="nav-item dropdown border border-secondary-subtle rounded mx-1 my-1">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" style="color: #fffafa;" href="#" role="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
                         Forms
                     </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'home:assigned_forms' %}">Forms For Me</a></li>
-                        <li><a class="dropdown-item" href="{% url 'home:filled_forms' %}">Filled Forms</a></li>
-                        
-                        <li><a class="dropdown-item" href="{% url 'home:notice' %}">Notices</a></li>
-                        <li><a class="dropdown-item" href="#">View Memos</a></li>
+                    <ul class="dropdown-menu" style="background-color: rgb(0, 0, 0);">
+                        <li><a class="dropdown-item" style="color: #fcf8f8;" href="{% url 'home:assigned_forms' %}" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">Forms For Me</a></li>
+                        <li><a class="dropdown-item" style="color: #f7f7f7;" href="{% url 'home:filled_forms' %}" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">Filled Forms</a></li>
+                        <li><a class="dropdown-item" style="color: #ffffff;" href="{% url 'home:notice' %}" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">Notices</a></li>
+                        <li><a class="dropdown-item" style="color: #fefefe;" href="#" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">View Memos</a></li>
                         <li>
                             <hr class="dropdown-divider" />
                         </li>
                         {% if employee.is_manager %}
                         <li>
-                            <a class="dropdown-item" href="{% url 'home:createfeedbackform' %}">Create Feedback Form</a>
+                            <a class="dropdown-item" style="color: #f5eded;" href="{% url 'home:createfeedbackform' %}" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">Create Feedback Form</a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="{% url 'home:view_forms' %}">View All Forms</a>
+                            <a class="dropdown-item" style="color: #ffffff;" href="{% url 'home:view_forms' %}" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">View All Forms</a>
                         </li>
                         {% endif %}
                     </ul>
@@ -42,13 +41,13 @@
             {% if request.user.is_authenticated %}
             <div class="ms-auto">
                 <a href="/profile/">
-                    <button class="nav-iten btn btn-success mx-1 my-1">My Profile</button>
+                    <button class="nav-item btn mx-1 my-1" style="background-color: #000000; color: white;">My Profile</button>
                 </a>
                 <a href="/logout/">
-                    <button class="nav-item btn btn-danger mx-1 my-1">Logout</button>
+                    <button class="nav-item btn mx-1 my-1" style="background-color: #000000; color: white;">Logout</button>
                 </a>
-                {% endif %}
             </div>
+            {% endif %}
         </div>
     </div>
 </nav>
