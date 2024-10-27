@@ -45,6 +45,7 @@ class Department(models.Model):
     def __str__(self):
         return self.dept_name
 
+ 
 
 class Forms(models.Model):
     FORM_STATUS_CHOICES = [
@@ -59,10 +60,11 @@ class Forms(models.Model):
     review_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=FORM_STATUS_CHOICES)
     submission_date = models.DateField(null=True, blank=True)
+    created_by = models.ForeignKey(Users, on_delete=models.CASCADE, null=True)  
 
     def __str__(self):
         return self.title
- 
+
 
 class Questions(models.Model):
     QUESTION_TYPE_CHOICES = [
@@ -130,16 +132,17 @@ class Group(models.Model):
 
 
 class FormAssignedByTo(models.Model):
-    manager = models.ForeignKey(Manager, on_delete=models.CASCADE)
+    manager = models.ForeignKey(Manager, on_delete=models.CASCADE)  # Must be provided
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True)
     form = models.ForeignKey(Forms, on_delete=models.CASCADE)
-    assign_date = models.DateField()
+    assign_date = models.DateField(auto_now_add=True)
     has_filled = models.BooleanField(default=False)
     has_viewed = models.BooleanField(default=False)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)  # Link to group
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)   
+
     class Meta:
-        unique_together = ('form', 'employee')   # Optional for direct assignments
+        unique_together = ('form', 'employee')   
+
 
 
 class FilledForm(models.Model):

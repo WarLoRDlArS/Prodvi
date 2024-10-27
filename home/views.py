@@ -44,7 +44,7 @@ def index(request):
                 'has_filled': assigned_form.has_filled
             }
             latest_forms.append(form_info)
-        print(latest_forms)
+        # print(latest_forms)
         # Fetch memos (assuming you have a `Memo` model), if not you can skip this part
         # latest_memos = Memo.objects.order_by('-created_at')[:5] if Memo.objects.exists() else None
 
@@ -80,12 +80,14 @@ def edit_profile(request):
         username = request.POST.get('username')
         email = request.POST.get('email')
         
+        current_user = request.user
         # Update user details
         current_user.username = username
         current_user.email = email
         current_user.save()
 
         # Update employee name
+        employee = Employee.objects.get(user=current_user)
         employee.empname = username
         employee.save()
 
@@ -115,47 +117,47 @@ def createfeedbackform(request):
                     index = key.split('_')[-1]  # Get the question number
                     question_text = request.POST.get(key)
                     question_type = request.POST.get(f'question_type_{index}')
+
+                    # Validation for question text
+                    if not question_text:
+                        errors.append(f"Question text for question {index} is required.")
+
                     min_value = request.POST.get(f'min_value_{index}', None)  # Get min value if provided
                     max_value = request.POST.get(f'max_value_{index}', None)  # Get max value if provided
 
                     # Handle min_value and max_value for numeric questions
                     if question_type == 'numeric':
-                        # Default to infinity if not provided
-                        min_value = float('-inf') if not min_value else min_value
-                        max_value = float('inf') if not max_value else max_value
-
                         try:
-                            # Validate if the input is numeric
-                            min_value = float(min_value)
-                            max_value = float(max_value)
+                            min_value = float(min_value) if min_value else None
+                            max_value = float(max_value) if max_value else None
 
-                            if min_value > max_value:
-                                raise ValidationError("Min value cannot be greater than max value.")
-                            
+                            if min_value is not None and max_value is not None and min_value > max_value:
+                                errors.append("Min value cannot be greater than max value.")
                         except ValueError:
                             errors.append(f"Non-numeric values entered for min/max values in question {index}.")
-                    else:
-                        min_value, max_value = None, None  # Set to None for non-numeric questions
 
+                    # Store valid question details
                     questions.append((question_text, question_type, min_value, max_value))
 
             # If there are any errors, display them back to the user
             if errors:
-                form.add_error(None, " ".join(errors))
-            else:
-                # Loop through the questions and save them
-                for question_text, question_type, min_value, max_value in questions:
-                    if question_text:  # Ensure that the question text is not empty
-                        Questions.objects.create(
-                            form=form_instance,
-                            question_text=question_text,
-                            question_type=question_type,
-                            min_value=min_value,  # Save the min value, can be None
-                            max_value=max_value   # Save the max value, can be None
-                        )
+                for error in errors:
+                    form.add_error(None, error)
+                return render(request, 'home/createFormTemplate.html', {'form': form})
 
-                # Redirect to assign form template after creation
-                return redirect('home:assign_form_to_group', form_id=form_instance.form_id)  # Update the URL name as needed
+            # Loop through the questions and save them
+            for question_text, question_type, min_value, max_value in questions:
+                if question_text:  # Ensure that the question text is not empty
+                    Questions.objects.create(
+                        form=form_instance,
+                        question_text=question_text,
+                        question_type=question_type,
+                        min_value=min_value,  # Save the min value
+                        max_value=max_value   # Save the max value
+                    )
+
+            # Redirect to the next step after successful creation
+            return redirect('home:assign_form_to_group', form_id=form_instance.form_id)
 
     else:
         form = FeedbackForm()
@@ -173,7 +175,7 @@ def NoticeView(request):
         Q(posted_by=request.user) | Q(noticestatus__employee=emp)
     ).distinct().order_by('-posted_on')
 
-    print(f"User: {request.user.username}, is_manager: {is_manager}")
+    # print(f"User: {request.user.username}, is_manager: {is_manager}")
     return render(request, 'home/notice.html', context={'notices': notices})
 
 

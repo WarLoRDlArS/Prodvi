@@ -3,8 +3,7 @@ from .models import Users
 
 
 class CustomBackend(BaseBackend):
-    def authenticate(self, request, pid=None, password=None, **kwargs):
-        print("AUthenticate was called")
+    def authenticate(self, request, pid=None, password=None, **kwargs): 
         try:
             user = Users.objects.get(pid=pid)
             if user.check_password(password):
