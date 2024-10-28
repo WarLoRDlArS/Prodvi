@@ -16,12 +16,20 @@ from home.models import Employee, Manager
 
 # def index(request):
 #     return HttpResponse("Hello To Prodvi")
-# above stuff is managed by home
+# above stuff is managed by home 
 
 def login_page(request):
     if request.method == "POST": 
         pid = request.POST.get("pid")
         password = request.POST.get("password")
+
+        if not pid:
+            messages.error(request, 'PID is required')
+            return redirect('users:login')
+        
+        if not password:
+            messages.error(request, 'Password is required')
+            return redirect('users:login')
 
         if not Users.objects.filter(pid=pid).exists():
             messages.error(request, 'Invalid PID')
@@ -31,18 +39,12 @@ def login_page(request):
         if user is None:
             messages.error(request, 'Invalid Credentials')
             return redirect('users:login')
-            # print("User is None")
         
         login(request, user)
-        # print("Login Successful")
-        #  Login is a success
         return redirect('home:index')
 
-        # Test Login
-        # pid: 000000
-        # password: abc
-
     return render(request, 'users/login.html')
+
 
 
 def landing_page(request):
@@ -50,44 +52,57 @@ def landing_page(request):
         return redirect("home:index")
     return render(request, 'users/landing_page.html')
  
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from home.models import Users, Employee, Manager  # Ensure you import your models
+
 def signup_page(request):
     if request.method == 'POST': 
         name = request.POST.get('name')
-        email = request.POST.get("email")
+        email = request.POST.get('email')
         pid = request.POST.get('pid')
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
 
+        # Check if passwords match
         if password1 != password2: 
-            messages.add_message(request, messages.ERROR, 'Password Should be Same', extra_tags='signup_diff_passwd')
+            messages.error(request, 'Passwords should match.', extra_tags='signup_diff_passwd')
             return redirect('users:signup')
 
+        # Check if PID length is valid
         if len(pid) != 6:
-            # print("PID length should be exactly 6")
-            messages.add_message(request, messages.ERROR, 'PID Length Should be Exactly 6')
+            messages.error(request, 'PID length should be exactly 6.')
             return redirect('users:signup')
         
-        userexists = Users.objects.filter(pid=pid)
-        if userexists:
-            # print("User Exists")
-            messages.add_message(request, messages.ERROR, 'User Already Exists')
+        # Check if the user already exists
+        if Users.objects.filter(pid=pid).exists():
+            messages.error(request, 'User already exists.')
             return redirect('users:signup')
 
-        is_manager = True if request.POST.get('role') == 'manager' else False 
+        # Determine if the user is a manager
+        is_manager = request.POST.get('role') == 'manager' 
+
+        # Try to create the user and associated employee/manager
         try:
             newuser = Users.objects.create(pid=pid, username=name, email=email)
-            newuser.set_password(password2)
+            newuser.set_password(password1)  # Use password1 as it should match password2
+            newuser.save()  # Save the user instance first
+
+            # Create the employee instance
             newemp = Employee.objects.create(user=newuser, empid=pid, empname=name, is_manager=is_manager)
+
+            # If the user is a manager, create a manager instance
             if is_manager:
-                newman = Manager.objects.create(user=newuser, managerid=pid, is_manager=True)
-                newman.save()
-            newemp.save()    
-            newuser.save()
-            # print("User Created Successfully!!")
+                Manager.objects.create(user=newuser, managerid=pid, is_manager=True)
+
+            # Successful signup
+            messages.success(request, 'Signup successful! Please log in.')
             return redirect('users:login')
-        except:
-            # print('some error occured')
-            messages.add_message(request, messages.ERROR, 'Sorry! User could not be Created', extra_tags='signup_user_not_created')
+
+        except Exception as e:
+            # Log the exception message if necessary for debugging
+            messages.error(request, 'Sorry! User could not be created. Please try again.')
             return redirect('users:signup')
 
+    # Render the signup page for GET requests
     return render(request, 'users/signup.html')
