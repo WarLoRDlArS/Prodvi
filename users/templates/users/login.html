@@ -242,19 +242,18 @@
         <h2 class="text-white mb-4">Login to Your Account</h2>
         <div class="form-group mb-3">
           <label for="pidbox">Enter PID:</label>
-          <input name="pid" type="number" class="form-control" id="pidbox" placeholder="000000" required />
+          <input name="pid" type="number" class="form-control" id="pidbox" placeholder="000000"/>
         </div>
         <div class="form-group">
           <label for="inputPassword">Password</label>
-          <input name="password" type="password" class="form-control" id="inputPassword" placeholder="Password"
-            required />
+          <input name="password" type="password" class="form-control" id="inputPassword" placeholder="Password"/>
         </div>
 
         <!-- Error Messages Section -->
         <div class="mt-3">
           {% if messages %}
           {% for message in messages %}
-          <div class="error alert alert-danger messages" role="alert">
+          <div class="error alert alert-danger messages" name="messages" role="alert">
             {{ message }}
           </div>
           {% endfor %}

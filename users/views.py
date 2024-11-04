@@ -26,7 +26,11 @@ def login_page(request):
         if not pid:
             messages.error(request, 'PID is required')
             return redirect('users:login')
-        
+
+        if len(pid) > 6:  # Adjust this based on your requirements
+            messages.error(request, 'Invalid PID')
+            return redirect('users:login')
+
         if not password:
             messages.error(request, 'Password is required')
             return redirect('users:login')
@@ -39,12 +43,11 @@ def login_page(request):
         if user is None:
             messages.error(request, 'Invalid Credentials')
             return redirect('users:login')
-        
+
         login(request, user)
         return redirect('home:index')
 
     return render(request, 'users/login.html')
-
 
 
 def landing_page(request):
@@ -71,7 +74,7 @@ def signup_page(request):
 
         # Check if PID length is valid
         if len(pid) != 6:
-            messages.error(request, 'PID length should be exactly 6.')
+            messages.error(request, 'PID Length Should be Exactly 6')
             return redirect('users:signup')
         
         # Check if the user already exists

@@ -8,7 +8,8 @@ from webdriver_manager.firefox import GeckoDriverManager
 class SignupPageTests(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+        # cls.driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+        cls.driver = webdriver.Firefox()
         cls.base_url = 'http://localhost:8000'
 
     @classmethod
@@ -47,7 +48,7 @@ class SignupPageTests(TestCase):
         email_input.send_keys("test@example.com")
 
         pid_input = self.driver.find_element(By.NAME, 'pid')
-        pid_input.send_keys("999999")
+        pid_input.send_keys("121212")
 
         password1_input = self.driver.find_element(By.NAME, 'password1')
         password1_input.send_keys("abc")
@@ -57,7 +58,7 @@ class SignupPageTests(TestCase):
 
         role_select = self.driver.find_element(By.NAME, 'role')
         role_select.click()
-        role_select.find_element(By.XPATH, "//option[@value='employee']").click()
+        role_select.find_element(By.XPATH, "//option[@value='manager']").click()
 
         submit_button = self.driver.find_element(By.XPATH, "//button[@type='submit']")
         submit_button.click()

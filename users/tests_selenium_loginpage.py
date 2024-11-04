@@ -7,10 +7,13 @@ from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.firefox import GeckoDriverManager
 
 class LoginPageTests(LiveServerTestCase):
+    
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+        # cls.driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+        cls.driver = webdriver.Firefox()
+        cls.base_url = 'http://localhost:8000'
         cls.driver.implicitly_wait(5)  # Implicit wait for elements to load
 
     @classmethod
@@ -39,23 +42,43 @@ class LoginPageTests(LiveServerTestCase):
                 EC.presence_of_element_located((By.CLASS_NAME, 'alert-danger'))
             ).text
             self.assertIn("PID is required", error_message)
-        except TimeoutException:
+        except:
             self.fail("Error message not found after form submission.")
 
     def test_invalid_login_short_pid(self):
         """Test login with pid that is too short (BVA - boundary condition)."""
         self.login('222', 'larson')
-        error_message = self.driver.find_element(By.CLASS_NAME, 'error').text
+        error_message = self.driver.find_element(By.CLASS_NAME, 'alert-danger').text
         self.assertIn("Invalid PID", error_message)
 
     def test_invalid_login_long_pid(self):
-        """Test login with pid that is too long (BVA - boundary condition)."""
-        self.login('1234567', 'larson')
-        error_message = self.driver.find_element(By.CLASS_NAME, 'alert').text
-        self.assertIn("Invalid PID", error_message) 
+        self.driver.get(self.base_url + '/login/')
+        
+        # Enter a PID that is too long
+        self.driver.find_element(By.NAME, 'pid').send_keys('1234567')  # Example of long PID
+        self.driver.find_element(By.NAME, 'password').send_keys('password')  # Any password
+        self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
+
+        # Wait for the error message to appear
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.CLASS_NAME, 'alert-danger'))
+        )
+
+        error_message = self.driver.find_element(By.CLASS_NAME, 'alert-danger').text
+        self.assertIn("Invalid PID", error_message)
 
     def test_invalid_login_wrong_credentials(self):
-        """Test login with incorrect credentials."""
-        self.login('222104', 'wrongpass')
-        error_message = self.driver.find_element(By.CLASS_NAME, 'messages').text
-        self.assertIn("Invalid credentials", error_message)
+        self.driver.get(self.base_url + '/login/')
+        
+        # Enter valid PID but wrong password
+        self.driver.find_element(By.NAME, 'pid').send_keys('000000')  # Example of valid PID
+        self.driver.find_element(By.NAME, 'password').send_keys('wrongpassword')  # Wrong password
+        self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
+
+        # Wait for the error message to appear
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.CLASS_NAME, 'alert-danger'))
+        )
+
+        error_message = self.driver.find_element(By.CLASS_NAME, 'alert-danger').text
+        self.assertIn("Invalid Credentials", error_message)
