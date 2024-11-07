@@ -19,6 +19,9 @@ from home.models import Employee, Manager
 # above stuff is managed by home 
 
 def login_page(request):
+    # Clear any existing messages
+    messages.get_messages(request).used = True
+
     if request.method == "POST": 
         pid = request.POST.get("pid")
         password = request.POST.get("password")
@@ -60,6 +63,9 @@ from django.contrib import messages
 from home.models import Users, Employee, Manager  # Ensure you import your models
 
 def signup_page(request):
+    # Clear any existing messages
+    messages.get_messages(request).used = True
+    
     if request.method == 'POST': 
         name = request.POST.get('name')
         email = request.POST.get('email')

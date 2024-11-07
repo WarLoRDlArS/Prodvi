@@ -33,6 +33,12 @@
                         <li>
                             <a class="dropdown-item" style="color: #ffffff;" href="{% url 'home:view_forms' %}" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">View All Forms</a>
                         </li>
+                        <li>
+                            <a class="dropdown-item" style="color: #f5eded;" href="{% url 'home:create_group' %}" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">Create Group</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" style="color: #f5eded;" href="{% url 'home:group_list' %}" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">View Groups</a>
+                        </li>
                         {% endif %}
                     </ul>
                 </li>
