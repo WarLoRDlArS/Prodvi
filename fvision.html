@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Performance Dashboard</title>
+
+    <!-- C3.js and D3.js Libraries -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.js"></script>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f7e7ce;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #090909;
+            text-align: center;
+            margin-bottom: 1rem;
+            animation: fadeIn 1s ease;
+        }
+
+        .chart-container {
+            margin: 30px 0;
+            animation: slideIn 1s ease-out;
+        }
+
+        .chart-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chart-half {
+            width: 48%;
+        }
+
+        .feedback-section {
+            background-color: #000000;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgb(0, 0, 0);
+            margin-top: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s, transform 1s;
+        }
+
+        .feedback-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .suggestion {
+            margin-bottom: 15px;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: #fffefe
+        }
+
+        .suggestion::before {
+            content: "• ";
+            color: #ffffff;
+        }
+
+        .summary-section {
+            background-color: #000000;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgb(0, 0, 0);
+            margin-top: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s, transform 1s;
+        }
+
+        .summary-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .summary-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .summary-item {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.762)
+        }
+
+        .summary-item strong {
+            color: #fffefe;
+        }
+
+        /* Keyframe Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Footer */
+        .simple-footer {
+            background-image: url("https://t4.ftcdn.net/jpg/05/04/84/75/360_F_504847577_CFVb63kJEBe2MAdWWTHmwzPfKwS9Un3p.jpg");
+            color: #ffffff;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 0.85rem;
+            position: relative;
+            /* Sticks the footer at the bottom */
+            bottom: 0;
+            width: 100%;
+            z-index: 1000;
+            /* Ensures it stays on top */
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg" style="background-color: #000000;">
+        <div class="container-fluid">
+            <a class="navbar-brand" style="color: #fefefe;" href="/">Prodvi</a> <!-- Dark text for brand -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" style="color: #ffffff;" href="{% url 'home:employee_notices' %}">New
+                            Notices</a> <!-- Dark text -->
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="#">Memo</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" style="color: #fffafa;" href="#" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Forms
+                        </a>
+                        <ul class="dropdown-menu" style="background-color: rgb(0, 0, 0);">
+                            <li><a class="dropdown-item" style="color: #fcf8f8;" href="{% url 'home:assigned_forms' %}"
+                                    onmouseover="this.style.backgroundColor='darkgray'"
+                                    onmouseout="this.style.backgroundColor='black'">Forms For Me</a></li>
+                            <li><a class="dropdown-item" style="color: #f7f7f7;" href="{% url 'home:filled_forms' %}"
+                                    onmouseover="this.style.backgroundColor='darkgray'"
+                                    onmouseout="this.style.backgroundColor='black'">Filled Forms</a></li>
+                            <li><a class="dropdown-item" style="color: #ffffff;" href="{% url 'home:notice' %}"
+                                    onmouseover="this.style.backgroundColor='darkgray'"
+                                    onmouseout="this.style.backgroundColor='black'">Notices</a></li>
+                            <li><a class="dropdown-item" style="color: #fefefe;" href="#"
+                                    onmouseover="this.style.backgroundColor='darkgray'"
+                                    onmouseout="this.style.backgroundColor='black'">View Memos</a></li>
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+                            <li>
+                                <a class="dropdown-item" style="color: #f5eded;"
+                                    href="{% url 'home:createfeedbackform' %}"
+                                    onmouseover="this.style.backgroundColor='darkgray'"
+                                    onmouseout="this.style.backgroundColor='black'">Create Feedback Form</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" style="color: #ffffff;" href="{% url 'home:view_forms' %}"
+                                    onmouseover="this.style.backgroundColor='darkgray'"
+                                    onmouseout="this.style.backgroundColor='black'">View All Forms</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <!-- Right-aligned buttons -->
+                <div class="ms-auto d-flex">
+                    <a href="/profile/">
+                        <button class="nav-item btn mx-1 my-1" style="background-color: #000000; color: white;">My
+                            Profile</button>
+                    </a>
+                    <a href="/logout/">
+                        <button class="nav-item btn mx-1 my-1"
+                            style="background-color: #000000; color: white;">Logout</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Employee Performance Dashboard</h1>
+
+        <!-- Performance Rating Bar Chart -->
+        <div class="chart-container" id="bar-chart-container">
+            <h3>Performance Rating (Monthly)</h3>
+            <div id="bar-chart"></div>
+        </div>
+
+        <!-- Side-by-Side Pie and Donut Charts -->
+        <div class="chart-container chart-row">
+            <div class="chart-half">
+                <h3>Skill Distribution</h3>
+                <div id="pie-chart"></div>
+            </div>
+            <div class="chart-half">
+                <h3>Project Contributions</h3>
+                <div id="donut-chart"></div>
+            </div>
+        </div>
+
+        <!-- Line Chart - Performance Over Time -->
+        <div class="chart-container" id="line-chart-container">
+            <h3>Performance Over Time</h3>
+            <div id="line-chart"></div>
+        </div>
+
+        <!-- Summary Section with Fade-in Animation -->
+        <div class="summary-section" id="summary-section">
+            <div class="summary-title">Employee Summary</div>
+            <div class="summary-item"><strong>Performance Trend:</strong> Consistently high performance with a steady
+                upward trajectory, showing an impressive commitment to improvement.</div>
+            <div class="summary-item"><strong>Key Skills:</strong> Strong in technical skills, problem-solving, and
+                communication. Areas like adaptability and teamwork could use further development.</div>
+            <div class="summary-item"><strong>Project Contributions:</strong> Significant contributions to multiple key
+                projects, particularly in Project A and Project B, demonstrating leadership potential.</div>
+            <div class="summary-item"><strong>Overall Rating:</strong> Excellent performance across the board with room
+                for growth in collaboration and project management.</div>
+        </div>
+
+        <!-- Feedback Section with Fade-in Animation -->
+        <div class="feedback-section" id="feedback-section">
+            <div class="feedback-title">Feedback and Suggestions</div>
+            <div class="suggestion">Consider enhancing skills in project management.</div>
+            <div class="suggestion">Great work on meeting deadlines consistently!</div>
+            <div class="suggestion">Focus on teamwork and collaboration for upcoming projects.</div>
+        </div>
+    </div>
+
+    <!-- Initialize C3 Charts and Feedback Animation -->
+    <script>
+        // Bar Chart - Performance Rating (Monthly)
+        var barChart = c3.generate({
+            bindto: '#bar-chart',
+            data: {
+                columns: [
+                    ['Performance', 85, 88, 90, 92, 85, 87, 89, 90, 91, 92, 93, 94]
+                ],
+                type: 'bar',
+                colors: {
+                    Performance: '#090909'
+                }
+            },
+            bar: {
+                width: { ratio: 0.6 }
+            },
+            axis: {
+                x: {
+                    type: 'category',
+                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                }
+            },
+            transition: { duration: 800 }
+        });
+
+        // Pie Chart - Skill Distribution
+        var pieChart = c3.generate({
+            bindto: '#pie-chart',
+            data: {
+                columns: [
+                    ['Communication', 25],
+                    ['Technical Skills', 30],
+                    ['Problem Solving', 20],
+                    ['Teamwork', 15],
+                    ['Adaptability', 10]
+                ],
+                type: 'pie',
+                colors: {
+                    Communication: '#6c757d',
+                    'Technical Skills': '#28a745',
+                    'Problem Solving': '#17a2b8',
+                    Teamwork: '#ffc107',
+                    Adaptability: '#dc3545'
+                }
+            },
+            transition: { duration: 1000 }
+        });
+
+        // Donut Chart - Project Contributions
+        var donutChart = c3.generate({
+            bindto: '#donut-chart',
+            data: {
+                columns: [
+                    ['Project A', 30],
+                    ['Project B', 25],
+                    ['Project C', 20],
+                    ['Project D', 15],
+                    ['Project E', 10]
+                ],
+                type: 'donut',
+                colors: {
+                    'Project A': '#28a745',
+                    'Project B': '#17a2b8',
+                    'Project C': '#ffc107',
+                    'Project D': '#dc3545',
+                    'Project E': '#6c757d'
+                }
+            },
+            donut: {
+                title: "Contributions"
+            },
+            transition: { duration: 1200 }
+        });
+
+        // Line Chart - Performance Over Time
+        var lineChart = c3.generate({
+            bindto: '#line-chart',
+            data: {
+                columns: [
+                    ['Performance', 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96]
+                ],
+                type: 'line',
+                colors: {
+                    Performance: '#17a2b8'
+                }
+            },
+            axis: {
+                x: {
+                    type: 'category',
+                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                }
+            },
+            transition: { duration: 800 }
+        });
+
+        // Scroll Animation for Summary Section
+        const summarySection = document.getElementById("summary-section");
+        window.addEventListener("scroll", () => {
+            const sectionPosition = summarySection.getBoundingClientRect().top;
+            const screenPosition = window.innerHeight / 1.2;
+            if (sectionPosition < screenPosition) {
+                summarySection.classList.add("visible");
+            }
+        });
+
+        // Scroll Animation for Feedback Section
+        const feedbackSection = document.getElementById("feedback-section");
+        window.addEventListener("scroll", () => {
+            const sectionPosition = feedbackSection.getBoundingClientRect().top;
+            const screenPosition = window.innerHeight / 1.2;
+            if (sectionPosition < screenPosition) {
+                feedbackSection.classList.add("visible");
+            }
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <footer class="simple-footer">
+        <p>&copy; 2024 Prodvi. All Rights Reserved.</p>
+    </footer>
+</body>
+
+</html>
