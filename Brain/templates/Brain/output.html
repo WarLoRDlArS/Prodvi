@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hello</title>
+  </head>
+  <body>
+    <h1>Hello</h1>
+
+    {% block content %}
+    <h1>Form Data</h1>
+    <ul>
+      {% for question in form_data.questions %}
+      <li>
+        {{ question.question }}
+        <ul>
+          {% for answer in question.answers %}
+          <li>{{ answer }}</li>
+          {% endfor %}
+        </ul>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endblock %}
+  </body>
+</html>

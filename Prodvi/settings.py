@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'users.apps.UsersConfig',
-    'home.apps.HomeConfig',
+    'home.apps.HomeConfig', 
+    'Brain.apps.BrainConfig',
 ]
 
 MIDDLEWARE = [
@@ -68,7 +69,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 # Employee context used accross the templates
-                'home.context_processors.employee_context',
+                'home.context_processors.employee_context', 
             ],
         },
     },
