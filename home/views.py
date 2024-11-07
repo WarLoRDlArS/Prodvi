@@ -125,6 +125,9 @@ def createfeedbackform(request):
                     min_value = request.POST.get(f'min_value_{index}', None)  # Get min value if provided
                     max_value = request.POST.get(f'max_value_{index}', None)  # Get max value if provided
 
+                    min_value = min_value if min_value else 0
+                    max_value = max_value if max_value else 0
+
                     # Handle min_value and max_value for numeric questions
                     if question_type == 'numeric':
                         try:

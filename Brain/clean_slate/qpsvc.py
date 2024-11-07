@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC
-from genprocess import Brain  # Import the Brain class
+from .genprocess import Brain  # Import the Brain class
 
 class QuestionClassifier:
     def __init__(self):

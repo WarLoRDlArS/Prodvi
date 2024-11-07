@@ -1,11 +1,16 @@
 from django.shortcuts import render
-# from Brain.clean_slate.qpsvc import QuestionClassifier
-# from Brain.clean_slate.api import FileProcessor 
-# from Brain.clean_slate.genprocess import Brain
+from .clean_slate.qpsvc import QuestionClassifier
+from .clean_slate.api import FileProcessor 
+# from .clean_slate.genprocess import Brain
 from home.models import Forms, Questions, QuestionAnswers
 from django.http import JsonResponse
 
 def output(request):
+    form_data = get_form_data(9)
+    
+    if 'error' in form_data:
+        print(form_data)
+        return JsonResponse({'error': form_data['error']}, status=404)
     
     return render(request, 'Brain/output.html')
 
@@ -41,9 +46,10 @@ def get_form_data(form_identifier):
     return form_data
 
 def another_view(request, form_identifier):
-    form_data = get_form_data(form_identifier)
+    form_data = get_form_data(9)
     
     if 'error' in form_data:
+        print(form_data)
         return JsonResponse({'error': form_data['error']}, status=404)
 
     return JsonResponse(form_data)
