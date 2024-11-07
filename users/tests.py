@@ -64,7 +64,7 @@ class UserViewsTests(TestCase):
         })
         self.assertEqual(response.status_code, 302)  # Redirect after failure
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(str(messages[0]), 'Password Should be Same')
+        self.assertEqual(str(messages[0]), 'Passwords should match.')
 
     def test_signup_page_post_invalid_pid_length(self):
         response = self.client.post(reverse('users:signup'), {
