@@ -252,11 +252,24 @@ def create_group(request):
         group_name = request.POST.get('group_name')
         new_group = Group(name=group_name)
         new_group.save()
-        # Add manager to the group
+        
+        # Add the manager to the group
         new_group.managers.add(request.user.employee.managerid)  # Assuming the manager is logged in
-        return redirect('home:group_list')
 
-    return render(request, 'create_group.html')
+        # Adding employees to the group
+        employee_ids = request.POST.getlist('employees')
+        for emp_id in employee_ids:
+            print(f"empid is {emp_id}")
+            employee = Employee.objects.get(empid=emp_id)
+            new_group.employees.add(employee)
+
+        messages.success(request, 'Group created successfully!')
+        return redirect('home:group_list')  # Redirect to the group list after creation
+
+    # Retrieve all employees to display as options for the group
+    employees = Employee.objects.all()
+    return render(request, 'home/create_group.html', {'employees': employees})
+
 
 
 # TODO
@@ -267,11 +280,25 @@ def group_list(request):
 
 
 @login_required(login_url='users:login')
+def delete_group(request, group_id):
+    group = get_object_or_404(Group, pk=group_id, managers=request.user.employee.managerid)
+    group.delete()
+    messages.success(request, "Group has been deleted successfully.")
+    return redirect('home:group_list')
+
+
+@login_required(login_url='users:login')
 def assign_form_to_group(request, form_id):
     form = Forms.objects.get(form_id=form_id)
     assigned_users = []
     
     if request.method == 'POST':
+        if 'assign_peer_review' in request.POST:
+            group_id = request.POST.get('group_id')
+            if group_id:
+                # Redirect to peer review assignment function
+                return redirect('home:assign_peer_review', form_id=form_id, group_id=group_id)
+
         group_id = request.POST.get('group_id')
         pid_list = request.POST.get('pids', '')
 
@@ -289,8 +316,7 @@ def assign_form_to_group(request, form_id):
                     group=group,
                     assign_date=date.today()
                 )
-
-        # Assign form to users based on PIDs
+ 
         current_user = Manager.objects.get(user=request.user)
         for pid in pid_list:
             try:
@@ -312,6 +338,33 @@ def assign_form_to_group(request, form_id):
     # Fetch available groups
     groups = Group.objects.filter(managers=request.user.employee.managerid)
     return render(request, 'home/assign_form.html', {'form': form, 'groups': groups, 'assigned_users': assigned_users})
+
+@login_required(login_url='users:login')
+def assign_peer_review(request, form_id, group_id):
+    form = get_object_or_404(Forms, pk=form_id)
+    group = get_object_or_404(Group, pk=group_id)
+    employees = group.employees.all()
+    
+    if request.method == "POST":
+        # Assign the form for peer review
+        for employee in employees:
+            for peer in employees:
+                if employee != peer:
+                    FormAssignedByTo.objects.get_or_create(
+                        manager=request.user.employee.managerid,
+                        employee=peer,
+                        form=form,
+                        group=group,
+                        peer_review=True
+                    )
+        messages.success(request, "Peer review forms have been assigned successfully.")
+        return redirect('home:index')
+    
+    return render(request, 'home/assign_peer_review.html', {
+        'form': form,
+        'group': group,
+    })
+
 
 
 @login_required(login_url='users:login')
@@ -407,3 +460,39 @@ def filled_forms(request):
     filled_forms = FilledForm.objects.filter(employee=employee).select_related('form')
 
     return render(request, 'home/filled_forms.html', {'filled_forms': filled_forms})
+  
+  
+from django.http import HttpResponseRedirect
+
+@login_required(login_url='users:login')
+def assign_peer_review(request, form_id, group_id):
+    form = get_object_or_404(Forms, pk=form_id)
+    group = get_object_or_404(Group, pk=group_id)  # Get the group using the group_id from the URL
+    employees = group.employees.all()
+
+    # Fetch available groups (for the manager)
+    groups = Group.objects.filter(managers=request.user.employee.managerid)
+
+    if request.method == "POST":
+        # Assign the form for peer review to all employees (excluding themselves)
+        for employee in employees:
+            for peer in employees:
+                if employee != peer:
+                    FormAssignedByTo.objects.get_or_create(
+                        manager=request.user.manager,
+                        employee=peer,
+                        form=form,
+                        group=group,
+                        peer_review=True
+                    )
+        messages.success(request, "Peer review forms have been assigned successfully.")
+        
+        # Redirect to the previous page
+        # return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        return redirect('home:assign_form_to_group', form_id=form_id)
+    return render(request, 'home/assign_peer_review.html', context={
+        'form': form,
+        'group': group,
+        'employees': employees,
+        'groups': groups  # Pass the groups to the template
+    })

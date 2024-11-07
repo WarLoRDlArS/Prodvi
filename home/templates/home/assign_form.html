@@ -45,7 +45,18 @@
                 <input type="text" name="pids" class="form-control" placeholder="Enter PIDs, e.g., 123456, 234567" />
             </div>
 
-            <button type="submit" class="btn btn-primary">Assign Form</button>
+            <!-- New Checkbox and Buttons for Peer Review -->
+            <div class="form-check mt-3">
+                <input type="checkbox" class="form-check-input" name="peer_review" id="peerReviewCheckbox">
+                <label class="form-check-label" for="peerReviewCheckbox">Assign as Peer Review</label>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" name="assign" value="assign" class="btn btn-primary">Assign Form</button>
+                <button type="submit" name="assign_peer_review" value="assign_peer_review" class="btn btn-secondary ms-2">
+                    Assign Peer Review
+                </button>
+            </div>
         </form>
 
         {% if assigned_users %}

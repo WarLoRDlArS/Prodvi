@@ -139,9 +139,13 @@ class FormAssignedByTo(models.Model):
     has_filled = models.BooleanField(default=False)
     has_viewed = models.BooleanField(default=False)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)   
+    peer_review = models.BooleanField(default=False)  # New flag for peer review assignments
 
     class Meta:
-        unique_together = ('form', 'employee')   
+        unique_together = ('form', 'employee', 'group')
+
+    def __str__(self):
+        return f"Form {self.form.title} assigned to {self.employee.empname} for group {self.group.name}"
 
 
 

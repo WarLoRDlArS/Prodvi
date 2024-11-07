@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'home.apps.HomeConfig', 
     'Brain.apps.BrainConfig',
+
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -159,3 +161,6 @@ STATICFILES_DIRS = [
 ]
 # do collect static after changing any static files
 
+
+
+CRISPY_TEMPLATE_PACK = 'bootstrap5'

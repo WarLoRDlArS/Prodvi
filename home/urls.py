@@ -25,4 +25,12 @@ urlpatterns = [
     # URLs for notices and acknowledgment
     path('employee_notices/', views.employee_notices, name='employee_notices'),  # View employee notices
     path('acknowledge_notice/<int:notice_status_id>/', views.acknowledge_notice, name='acknowledge_notice'),  # Acknowledge notice
+
+    
+    path('create_group/', views.create_group, name='create_group'),
+    path('group_list/', views.group_list, name='group_list'),  
+    path('group/delete/<int:group_id>/', views.delete_group, name='delete_group'), 
+    # path('assign_peer_review/<int:form_id>/', views.assign_peer_review, name='assign_peer_review'),
+    path('assign_peer_review/<int:form_id>/<int:group_id>/', views.assign_peer_review, name='assign_peer_review'),
+
 ]
