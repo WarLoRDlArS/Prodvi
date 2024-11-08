@@ -7,9 +7,8 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" style="color: #ffffff;" href="{% url 'home:employee_notices' %}">New Notices</a> <!-- Dark text -->
-                </li>
+                <li><a class="nav-link" style="color: #ffffff;" href="{% url 'home:notice' %}" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">Notices</a></li>
+                
                 <li class="nav-item">
                     <a class="nav-link text-danger" href="#">Memo</a>
                 </li>
@@ -21,12 +20,13 @@
                     <ul class="dropdown-menu" style="background-color: rgb(0, 0, 0);">
                         <li><a class="dropdown-item" style="color: #fcf8f8;" href="{% url 'home:assigned_forms' %}" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">Forms For Me</a></li>
                         <li><a class="dropdown-item" style="color: #f7f7f7;" href="{% url 'home:filled_forms' %}" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">Filled Forms</a></li>
-                        <li><a class="dropdown-item" style="color: #ffffff;" href="{% url 'home:notice' %}" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">Notices</a></li>
-                        <li><a class="dropdown-item" style="color: #fefefe;" href="#" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">View Memos</a></li>
-                        <li>
+                         <li>
                             <hr class="dropdown-divider" />
                         </li>
                         {% if employee.is_manager %}
+                        <li class="nav-item">
+                            <a class="dropdown-item" style="color: #ffffff;" href="{% url 'home:employee_notices' %}">New Notices</a> <!-- Dark text -->
+                        </li>
                         <li>
                             <a class="dropdown-item" style="color: #f5eded;" href="{% url 'home:createfeedbackform' %}" onmouseover="this.style.backgroundColor='darkgray'" onmouseout="this.style.backgroundColor='black'">Create Feedback Form</a>
                         </li>

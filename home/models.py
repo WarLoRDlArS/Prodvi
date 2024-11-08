@@ -1,11 +1,10 @@
 from django.db import models
-
-# Create your models here.
+ 
 from users.models import Users
 
 class Employee(models.Model):
     user = models.OneToOneField(Users, on_delete=models.CASCADE)
-    empid = models.CharField(primary_key=True, max_length=6)  # You might want to set a max length
+    empid = models.CharField(primary_key=True, max_length=6) 
     empname = models.CharField(max_length=255)
     empdept = models.ForeignKey('Department', on_delete=models.SET_NULL, null=True)
     managerid = models.ForeignKey('Manager', on_delete=models.SET_NULL, null=True, blank=True, related_name='employees')
@@ -13,24 +12,24 @@ class Employee(models.Model):
     is_manager = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        if not self.empid:  # Only set empid if it's not already set
-            self.empid = self.user.pid  # Set empid from user's pid
+        if not self.empid:  
+            self.empid = self.user.pid 
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Name: {self.empname} PID: {self.user.pid}"  # Use self.user.pid
+        return f"Name: {self.empname} PID: {self.user.pid}"  
 
 
 class Manager(models.Model):
     user = models.OneToOneField(Users, on_delete=models.CASCADE)
     # employee = models.OneToOneField(Employee, on_delete=models.CASCADE) 
-    managerid = models.CharField(primary_key=True, max_length=6)  # You might want to set a max length
+    managerid = models.CharField(primary_key=True, max_length=6)   
     is_manager = models.BooleanField(default=True)
     # user_pid = models.CharField(max_length=6)
 
     def save(self, *args, **kwargs):
-        if not self.managerid:  # Only set empid if it's not already set
-            self.managerid = self.user.pid  # Set empid from user's pid
+        if not self.managerid:  
+            self.managerid = self.user.pid   
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -76,8 +75,8 @@ class Questions(models.Model):
     question_type = models.CharField(max_length=10, choices=QUESTION_TYPE_CHOICES)
     question_id = models.AutoField(primary_key=True)
     question_text = models.TextField()
-    min_value = models.FloatField(null=True, blank=True)  # Min value for numeric questions
-    max_value = models.FloatField(null=True, blank=True)  # Max value for numeric questions
+    min_value = models.FloatField(null=True, blank=True)   
+    max_value = models.FloatField(null=True, blank=True)   
 
     def __str__(self):
         return self.question_text
@@ -132,14 +131,14 @@ class Group(models.Model):
 
 
 class FormAssignedByTo(models.Model):
-    manager = models.ForeignKey(Manager, on_delete=models.CASCADE, null=True)  # Must be provided
+    manager = models.ForeignKey(Manager, on_delete=models.CASCADE, null=True)   
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True)
     form = models.ForeignKey(Forms, on_delete=models.CASCADE)
     assign_date = models.DateField(auto_now_add=True)
     has_filled = models.BooleanField(default=False)
     has_viewed = models.BooleanField(default=False)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)   
-    peer_review = models.BooleanField(default=False)  # New flag for peer review assignments
+    peer_review = models.BooleanField(default=False)  
 
     class Meta:
         unique_together = ('form', 'employee', 'group')

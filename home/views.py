@@ -22,21 +22,16 @@ from .forms import NoticeForm, FeedbackForm
  
 @login_required(login_url='users:login')
 def index(request):
-    try:
-        # Get the current employee
+    try: 
         employee = Employee.objects.get(user=request.user)
-
-        # Fetch the top 5 new (unacknowledged) notices for the employee
+ 
         new_notices = NoticeStatus.objects.filter(employee=employee, acknowledged=False).order_by('-notice__posted_on')[:5]
-
-        # If there are no new notices, fetch the latest assigned notices
+ 
         if not new_notices.exists():
             new_notices = NoticeStatus.objects.filter(employee=employee).order_by('-notice__posted_on')[:5]
-
-        # Fetch the top 5 assigned forms for the employee
+ 
         assigned_forms = FormAssignedByTo.objects.filter(employee=employee).order_by('-assign_date')[:5]
-
-        # Fetching forms and determining if they are filled
+ 
         latest_forms = []
         for assigned_form in assigned_forms:
             form_info = {
@@ -55,8 +50,7 @@ def index(request):
         } 
 
         return render(request, 'home/index.html', context)
-    except Employee.DoesNotExist:
-        # Handle the case where the employee does not exist
+    except Employee.DoesNotExist: 
         return render(request, 'users/landing_page.html')
 
 
@@ -92,7 +86,7 @@ def edit_profile(request):
         employee.save()
 
         messages.success(request, 'Profile updated successfully!')
-        return redirect('home:userProfile')  # Redirect to profile page after saving
+        return redirect('home:userProfile')  
      
     return render(request, 'home/edit_profile.html')
 
@@ -107,18 +101,16 @@ def createfeedbackform(request):
             form_instance = form.save(commit=False)
             form_instance.status = 'fresh'
             form_instance.save()
-
-            # Initialize lists for question texts and types
+ 
             questions = []
-            errors = []  # To store any validation errors
+            errors = []   
 
             for key in request.POST:
                 if key.startswith('question_text_'):
-                    index = key.split('_')[-1]  # Get the question number
+                    index = key.split('_')[-1]   
                     question_text = request.POST.get(key)
                     question_type = request.POST.get(f'question_type_{index}')
-
-                    # Validation for question text
+ 
                     if not question_text:
                         errors.append(f"Question text for question {index} is required.")
 
@@ -127,8 +119,7 @@ def createfeedbackform(request):
 
                     min_value = min_value if min_value else 0
                     max_value = max_value if max_value else 0
-
-                    # Handle min_value and max_value for numeric questions
+ 
                     if question_type == 'numeric':
                         try:
                             min_value = float(min_value) if min_value else None
@@ -138,28 +129,24 @@ def createfeedbackform(request):
                                 errors.append("Min value cannot be greater than max value.")
                         except ValueError:
                             errors.append(f"Non-numeric values entered for min/max values in question {index}.")
-
-                    # Store valid question details
+ 
                     questions.append((question_text, question_type, min_value, max_value))
-
-            # If there are any errors, display them back to the user
+ 
             if errors:
                 for error in errors:
                     form.add_error(None, error)
                 return render(request, 'home/createFormTemplate.html', {'form': form})
-
-            # Loop through the questions and save them
+ 
             for question_text, question_type, min_value, max_value in questions:
-                if question_text:  # Ensure that the question text is not empty
+                if question_text: 
                     Questions.objects.create(
                         form=form_instance,
                         question_text=question_text,
                         question_type=question_type,
-                        min_value=min_value,  # Save the min value
-                        max_value=max_value   # Save the max value
+                        min_value=min_value,  
+                        max_value=max_value  
                     )
-
-            # Redirect to the next step after successful creation
+ 
             return redirect('home:assign_form_to_group', form_id=form_instance.form_id)
 
     else:
@@ -172,13 +159,11 @@ def createfeedbackform(request):
 def NoticeView(request):
     emp = Employee.objects.get(user=request.user)
     is_manager = emp.is_manager
-
-    # Get notices created by the logged-in user or assigned to the logged-in employee
+ 
     notices = Notice.objects.filter(
         Q(posted_by=request.user) | Q(noticestatus__employee=emp)
     ).distinct().order_by('-posted_on')
-
-    # print(f"User: {request.user.username}, is_manager: {is_manager}")
+ 
     return render(request, 'home/notice.html', context={'notices': notices})
 
 
@@ -186,26 +171,23 @@ def NoticeView(request):
 def add_notice(request):
     currentuseremp = Employee.objects.get(user=request.user)
     if not currentuseremp.is_manager:
-        return redirect('home:notice')  # Redirect if not a manager
+        return redirect('home:notice')  
 
     if request.method == 'POST':
         form = NoticeForm(request.POST)
         if form.is_valid():
             notice = form.save(commit=False)
-            notice.posted_by = request.user  # Set the user who posted the notice
+            notice.posted_by = request.user   
             notice.save()
-
-            # Assign notice to selected group or individual employees (like assigning a form)
+ 
             group_id = request.POST.get('group_id')
             pid_list = request.POST.get('pids', '')
-
-            # Assign notice to group members
+ 
             if group_id:
                 group = Group.objects.get(id=group_id)
                 for employee in group.employees.all():
                     NoticeStatus.objects.create(notice=notice, employee=employee)
-
-            # Assign notice to users based on PIDs
+ 
             pid_list = [pid.strip() for pid in pid_list.split(',') if pid.strip()]
             for pid in pid_list:
                 try:
@@ -215,7 +197,7 @@ def add_notice(request):
                 except Users.DoesNotExist:
                     continue
 
-            return redirect('home:notice')  # Redirect to the notices page
+            return redirect('home:notice')  
     else:
         form = NoticeForm()
 
@@ -228,8 +210,7 @@ def add_notice(request):
 @login_required(login_url='users:login')
 def employee_notices(request):
     employee = Employee.objects.get(user=request.user)
-
-    # Get all notices assigned to the employee that are not acknowledged
+ 
     new_notices = NoticeStatus.objects.filter(employee=employee, acknowledged=False)
 
     return render(request, 'home/employee_notices.html', {'new_notices': new_notices})
@@ -252,11 +233,9 @@ def create_group(request):
         group_name = request.POST.get('group_name')
         new_group = Group(name=group_name)
         new_group.save()
-        
-        # Add the manager to the group
-        new_group.managers.add(request.user.employee.managerid)  # Assuming the manager is logged in
-
-        # Adding employees to the group
+         
+        new_group.managers.add(request.user.employee.managerid)   
+ 
         employee_ids = request.POST.getlist('employees')
         for emp_id in employee_ids:
             print(f"empid is {emp_id}")
@@ -264,9 +243,8 @@ def create_group(request):
             new_group.employees.add(employee)
 
         messages.success(request, 'Group created successfully!')
-        return redirect('home:group_list')  # Redirect to the group list after creation
-
-    # Retrieve all employees to display as options for the group
+        return redirect('home:group_list')  
+ 
     employees = Employee.objects.all()
     return render(request, 'home/create_group.html', {'employees': employees})
 
@@ -295,20 +273,16 @@ def assign_form_to_group(request, form_id):
     if request.method == 'POST':
         if 'assign_peer_review' in request.POST:
             group_id = request.POST.get('group_id')
-            if group_id:
-                # Redirect to peer review assignment function
+            if group_id: 
                 return redirect('home:assign_peer_review', form_id=form_id, group_id=group_id)
 
         group_id = request.POST.get('group_id')
         pid_list = request.POST.get('pids', '')
-
-        # Strip any extra whitespace and split by comma
+ 
         pid_list = [pid.strip() for pid in pid_list.split(',') if pid.strip()]
-
-        # Assign form to group if selected
+ 
         if group_id:
-            group = Group.objects.get(id=group_id)
-            # Check if the form is already assigned to the group
+            group = Group.objects.get(id=group_id) 
             if not FormAssignedByTo.objects.filter(manager=request.user.employee.managerid, form=form, group=group).exists():
                 FormAssignedByTo.objects.create(
                     manager=request.user.employee.managerid,
@@ -320,8 +294,7 @@ def assign_form_to_group(request, form_id):
         current_user = Manager.objects.get(user=request.user)
         for pid in pid_list:
             try:
-                user = Users.objects.get(pid=pid)
-                # Check if the form is already assigned to the user
+                user = Users.objects.get(pid=pid) 
                 if not FormAssignedByTo.objects.filter(manager=current_user, form=form, employee=user.employee).exists():
                     FormAssignedByTo.objects.create(
                         manager=current_user,
@@ -334,8 +307,7 @@ def assign_form_to_group(request, form_id):
                 print(f"Error assigning form to {pid}")
 
         return redirect('home:index')
-
-    # Fetch available groups
+ 
     groups = Group.objects.filter(managers=request.user.employee.managerid)
     return render(request, 'home/assign_form.html', {'form': form, 'groups': groups, 'assigned_users': assigned_users})
 
@@ -345,8 +317,7 @@ def assign_peer_review(request, form_id, group_id):
     group = get_object_or_404(Group, pk=group_id)
     employees = group.employees.all()
     
-    if request.method == "POST":
-        # Assign the form for peer review
+    if request.method == "POST": 
         for employee in employees:
             for peer in employees:
                 if employee != peer:
@@ -369,49 +340,42 @@ def assign_peer_review(request, form_id, group_id):
 
 @login_required(login_url='users:login')
 def view_forms(request):
-    forms = Forms.objects.all()  # Get all forms
+    forms = Forms.objects.all().order_by('-form_id')
     return render(request, 'home/view_forms.html', context={'forms': forms})
 
 
 @login_required(login_url='users:login')
-def assigned_forms(request):
-    # Get the employee associated with the logged-in user
+def assigned_forms(request): 
     employee = get_object_or_404(Employee, user=request.user)
-
-    # Fetch all forms assigned to this employee
+ 
     assigned_forms = FormAssignedByTo.objects.filter(employee=employee).select_related('form')
-
-    # Update form status if the employee has viewed the form
+ 
     for assignment in assigned_forms:
         if not assignment.has_viewed:
             assignment.has_viewed = True
-            assignment.form.status = 'pending'  # Update status to 'pending'
-            assignment.save()  # Save changes
+            assignment.form.status = 'pending'   
+            assignment.save()  
 
     return render(request, 'home/assigned_forms.html', {'assigned_forms': assigned_forms})
 
 
 @login_required(login_url='users:login')
-def fill_feedback_form(request, form_id):
-    # Fetch the form based on the form_id
+def fill_feedback_form(request, form_id): 
     form_instance = Forms.objects.get(form_id=form_id)
-
-    # Ensure the logged-in employee has access to this form
+ 
     employee = Employee.objects.get(user=request.user)
     assignment = FormAssignedByTo.objects.filter(form=form_instance, employee=employee).first()
 
     if not assignment:
         messages.error(request, "You do not have permission to fill this form.")
         return redirect('home:index')
-
-    # Fetch all questions related to the form
+ 
     questions = Questions.objects.filter(form=form_instance)
 
     if request.method == 'POST':
         for question in questions:
             answer_key = f'question_{question.question_id}'
-            if question.question_type == 'text':
-                # For text questions, save the answer as text
+            if question.question_type == 'text': 
                 answer_text = request.POST.get(answer_key)
                 if answer_text:
                     QuestionAnswers.objects.create(
@@ -419,30 +383,25 @@ def fill_feedback_form(request, form_id):
                         user=request.user,
                         answer_text=answer_text
                     )
-            elif question.question_type == 'numeric':
-                # For numeric questions, save the numeric response
+            elif question.question_type == 'numeric': 
                 answer_value = request.POST.get(answer_key)
-                if answer_value:
-                    # First, create a QuestionAnswers entry
+                if answer_value: 
                     answer_entry = QuestionAnswers.objects.create(
                         question=question,
                         user=request.user,
-                        answer_text=''  # Optional: empty since numeric responses are in a separate model
-                    )
-                    # Then, create a NumericResponse entry
+                        answer_text=''  
+                    ) 
                     NumericResponse.objects.create(
                         answer=answer_entry,
                         user=request.user,
-                        answer_value=float(answer_value)  # Save as float
+                        answer_value=float(answer_value)  
                     )
-
-        # Create a FilledForm entry after form submission
+ 
         FilledForm.objects.create(
             form=form_instance,
             employee=employee
         )
-
-        # Remove the assignment and update the form status
+ 
         assignment.delete()
         form_instance.status = 'finished'
         form_instance.save()
@@ -467,14 +426,12 @@ from django.http import HttpResponseRedirect
 @login_required(login_url='users:login')
 def assign_peer_review(request, form_id, group_id):
     form = get_object_or_404(Forms, pk=form_id)
-    group = get_object_or_404(Group, pk=group_id)  # Get the group using the group_id from the URL
+    group = get_object_or_404(Group, pk=group_id)  
     employees = group.employees.all()
-
-    # Fetch available groups (for the manager)
+ 
     groups = Group.objects.filter(managers=request.user.employee.managerid)
 
-    if request.method == "POST":
-        # Assign the form for peer review to all employees (excluding themselves)
+    if request.method == "POST": 
         for employee in employees:
             for peer in employees:
                 if employee != peer:
@@ -494,5 +451,5 @@ def assign_peer_review(request, form_id, group_id):
         'form': form,
         'group': group,
         'employees': employees,
-        'groups': groups  # Pass the groups to the template
+        'groups': groups  
     })

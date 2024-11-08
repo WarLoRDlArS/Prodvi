@@ -30,7 +30,7 @@ def login_page(request):
             messages.error(request, 'PID is required')
             return redirect('users:login')
 
-        if len(pid) > 6:  # Adjust this based on your requirements
+        if len(pid) > 6:  
             messages.error(request, 'Invalid PID')
             return redirect('users:login')
 
@@ -60,7 +60,7 @@ def landing_page(request):
  
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from home.models import Users, Employee, Manager  # Ensure you import your models
+from home.models import Users, Employee, Manager   
 
 def signup_page(request):
     # Clear any existing messages
@@ -90,28 +90,22 @@ def signup_page(request):
 
         # Determine if the user is a manager
         is_manager = request.POST.get('role') == 'manager' 
-
-        # Try to create the user and associated employee/manager
+ 
         try:
             newuser = Users.objects.create(pid=pid, username=name, email=email)
-            newuser.set_password(password1)  # Use password1 as it should match password2
-            newuser.save()  # Save the user instance first
-
-            # Create the employee instance
+            newuser.set_password(password1)   
+            newuser.save()   
+ 
             newemp = Employee.objects.create(user=newuser, empid=pid, empname=name, is_manager=is_manager)
-
-            # If the user is a manager, create a manager instance
+ 
             if is_manager:
                 Manager.objects.create(user=newuser, managerid=pid, is_manager=True)
-
-            # Successful signup
+ 
             messages.success(request, 'Signup successful! Please log in.')
             return redirect('users:login')
 
-        except Exception as e:
-            # Log the exception message if necessary for debugging
+        except Exception as e: 
             messages.error(request, 'Sorry! User could not be created. Please try again.')
             return redirect('users:signup')
-
-    # Render the signup page for GET requests
+ 
     return render(request, 'users/signup.html')
