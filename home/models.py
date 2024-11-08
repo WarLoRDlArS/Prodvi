@@ -132,7 +132,7 @@ class Group(models.Model):
 
 
 class FormAssignedByTo(models.Model):
-    manager = models.ForeignKey(Manager, on_delete=models.CASCADE)  # Must be provided
+    manager = models.ForeignKey(Manager, on_delete=models.CASCADE, null=True)  # Must be provided
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True)
     form = models.ForeignKey(Forms, on_delete=models.CASCADE)
     assign_date = models.DateField(auto_now_add=True)

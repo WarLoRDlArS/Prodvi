@@ -315,7 +315,7 @@ def assign_form_to_group(request, form_id):
                     form=form,
                     group=group,
                     assign_date=date.today()
-                )
+                ) 
  
         current_user = Manager.objects.get(user=request.user)
         for pid in pid_list:
